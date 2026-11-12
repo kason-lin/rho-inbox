@@ -13,6 +13,7 @@
     "build:check": "NEXT_DIST_DIR=.next-build next build --turbopack"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@supabase/supabase-js": "^2.58.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",

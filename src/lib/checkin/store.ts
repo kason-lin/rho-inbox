@@ -102,11 +102,30 @@ async function audit(db: Db, rows: { actor: string; role: string; event: string;
   if (rows.length) must(await db.from('audit_log').insert(rows.map(r => ({ detail: {}, ...r }))), 'Writing audit log');
 }
 
+let current: Promise<Briefing> | null = null;
+let queued: Promise<Briefing> | null = null;
+
 /**
- * Run the engine and sync this week's proposed cards. Cards keep their id while they still
- * qualify (so an open screen doesn't break), new ones are added, and ones that dropped out are removed.
+ * Run the engine and sync this week's proposed cards. Several open pages can ask at the same time;
+ * rather than racing, callers that arrive mid-run share one follow-up run (which sees their changes).
  */
-export async function runCheckin(db: Db, now: Date = new Date()): Promise<Briefing> {
+export function runCheckin(db: Db, now?: Date): Promise<Briefing> {
+  if (!current) {
+    current = runCheckinOnce(db, now ?? new Date()).finally(() => { current = null; });
+    return current;
+  }
+  queued ??= current.catch(() => undefined).then(() => {
+    queued = null;
+    return runCheckin(db);
+  });
+  return queued;
+}
+
+/**
+ * Cards keep their id while they still qualify (so an open screen doesn't break), new ones are added,
+ * and ones that dropped out are removed.
+ */
+async function runCheckinOnce(db: Db, now: Date): Promise<Briefing> {
   const briefing = runEngine(await loadSnapshot(db, now));
   const week = weekOf(now);
   const existing = (must(
@@ -128,13 +147,20 @@ export async function runCheckin(db: Db, now: Date = new Date()): Promise<Briefi
   }
 
   for (const c of wanted.values()) {
-    const event = await insertInboxEvent(db, inboxEventFor(c));
-    const card = must(
-      await db.from('checkin_cards').insert({ ...cardColumns(c), week_of: week, data_as_of: briefing.data_as_of, inbox_event_id: event.id }).select('id').single(),
+    // Card first. If another run already created it, the unique constraint skips this insert
+    // and we don't create a second Inbox row either.
+    const inserted = must(
+      await db.from('checkin_cards')
+        .upsert({ ...cardColumns(c), week_of: week, data_as_of: briefing.data_as_of }, { onConflict: 'week_of,type,rule,vendor', ignoreDuplicates: true })
+        .select('id'),
       'Inserting card',
-    ) as { id: string };
-    must(await db.from('inbox_events').update({ meta: { ...event.meta, checkin_card_id: card.id } }).eq('id', event.id), 'Linking inbox row');
-    await audit(db, [{ actor: 'rho', role: 'engine', event: 'card_suggested', card_id: card.id, detail: { title: c.title, rule: c.rule, rank: c.rank, runway_days: c.runway_days } }]);
+    ) as { id: string }[];
+    if (!inserted.length) continue;
+    const cardId = inserted[0].id;
+    const draft = inboxEventFor(c);
+    const event = await insertInboxEvent(db, { ...draft, meta: { ...draft.meta, checkin_card_id: cardId } });
+    must(await db.from('checkin_cards').update({ inbox_event_id: event.id }).eq('id', cardId), 'Linking inbox row');
+    await audit(db, [{ actor: 'rho', role: 'engine', event: 'card_suggested', card_id: cardId, detail: { title: c.title, rule: c.rule, rank: c.rank, runway_days: c.runway_days } }]);
   }
 
   await audit(db, [{ actor: 'rho', role: 'engine', event: 'checkin_generated', detail: { cards: briefing.cards.map(c => c.title), others: briefing.others.length } }]);

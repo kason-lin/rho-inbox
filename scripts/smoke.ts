@@ -33,6 +33,16 @@ const checkin = async (as = 'maya') => (await call('GET', `/api/checkin?as=${as}
 const decide = (id: string, decision: string, as = 'maya') => call('POST', `/api/checkin/cards/${id}/decision`, { decision, as });
 
 async function main() {
+  // ---------- Concurrency: many open pages loading at once must not duplicate cards ----------
+  await call('POST', '/api/checkin/run');
+  const burst = await Promise.all(['maya', 'ana', 'dana', 'maya', 'jordan'].map(as => checkin(as)));
+  check('5 simultaneous loads still give exactly 3 cards', burst.every(b => b.cards.length === 3) && (await checkin()).cards.length === 3);
+
+  // ---------- AI digest (template when no ANTHROPIC_API_KEY) ----------
+  const digest = (await call('GET', '/api/digest?as=maya')).body as { text: string; source: string };
+  const sentences = digest.text.split(/(?<=[.!?”])\s+(?=[A-Z0-9])/).length;
+  check('digest is three sentences', sentences === 3, `${digest.source}: ${digest.text.slice(0, 70)}…`);
+
   // ---------- Monday check-in (screen 1) ----------
   const monday = await checkin();
   check('3 cards, in the spec order', monday.cards.map(c => c.type).join() === 'payday_guard,subscription_review,burn_change',

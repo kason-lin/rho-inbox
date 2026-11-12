@@ -2,6 +2,7 @@
 import { ArrowRight, CheckCircle2, ChevronDown, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { DigestCard } from '@/components/checkin/digest';
 import { DataAsOf, RoleBanner, TypeChip, useCheckin } from '@/components/checkin/shared';
 import { HeaderButton, PageHeader } from '@/components/shell/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +25,7 @@ export default function CheckinPage() {
 
       {data && (
         <>
+          <DigestCard />
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="font-display text-xl font-semibold">
               {data.cards.length ? `${data.cards.length} ${data.cards.length === 1 ? 'thing needs' : 'things need'} you` : "You're all set this week"}

@@ -1,6 +1,7 @@
 'use client';
 import { ArrowRight, Archive, Inbox, Paperclip, Search, Send, Star } from 'lucide-react';
 import Link from 'next/link';
+import { DigestCard } from '@/components/checkin/digest';
 import { useLive } from '@/hooks/use-live';
 import type { CheckinView } from '@/lib/checkin/store';
 import { formatUSD } from '@/lib/format';
@@ -74,6 +75,7 @@ export default function MailPage() {
               <div className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">Monday 8:00 AM · Weekly check-in</div>
               <h2 className="mt-2 font-display text-2xl font-semibold">{subject.replace(' this week', '')}</h2>
               <p className="mt-1 text-[13px] text-muted-foreground">Rho did the prep work. Each one takes a tap, and no money moves without you.</p>
+              <div className="mt-4"><DigestCard as="maya" compact /></div>
 
               <ol className="mt-5 space-y-3">
                 {(data?.cards ?? []).map((c, i) => (
