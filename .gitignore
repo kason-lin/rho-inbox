@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+!.env.example
+
+# earlier static marketing mock; uses Rho branding, keep it out of the repo
+pitch-mock/
