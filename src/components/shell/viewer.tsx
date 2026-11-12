@@ -17,11 +17,14 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
   const [id, setId] = useState('maya');
 
   useEffect(() => {
+    // ?as=ana in the URL switches the viewer (handy for links in the demo script and for screenshots).
+    const fromUrl = new URLSearchParams(window.location.search).get('as');
     try {
-      const saved = localStorage.getItem(KEY);
+      if (fromUrl) localStorage.setItem(KEY, fromUrl);
+      const saved = fromUrl ?? localStorage.getItem(KEY);
       if (saved) setId(saved);
     } catch {
-      // storage can be blocked; Maya is a fine default
+      if (fromUrl) setId(fromUrl);   // storage can be blocked; the URL still works for this page
     }
     fetch('/api/users')
       .then(r => r.json())
