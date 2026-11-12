@@ -1,26 +1,123 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+/*
+ * Rho app tokens, measured from app.rho.co (see docs/design-notes.md), mapped onto the
+ * variable names shadcn/ui components expect. Light theme only, like the real app.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.5rem;
+
+  --background: #fdfdfd;          /* canvas */
+  --foreground: #151716;          /* ink */
+  --card: #ffffff;
+  --card-foreground: #151716;
+  --popover: #ffffff;
+  --popover-foreground: #151716;
+  --primary: #151716;             /* primary buttons are near-black */
+  --primary-foreground: #ffffff;
+  --secondary: #f7f9f8;
+  --secondary-foreground: #151716;
+  --muted: #f7f9f8;
+  --muted-foreground: #6b716e;
+  --accent: #e9eeec;              /* hover / selected */
+  --accent-foreground: #151716;
+  --destructive: #db1a2d;
+  --border: #e3e8e6;
+  --input: #d7e0de;
+  --ring: #048d73;
+
+  --rho-ink-2: #454a48;
+  --rho-brand: #048d73;
+  --rho-brand-hover: #035e4d;
+  --rho-mint: #6af3d9;            /* marketing + "Pay" CTA */
+  --rho-mint-hover: #39efcd;
+  --rho-mint-ink: #0c3d33;
+  --rho-tint: #f7f9f8;
+  --rho-strong: #ced4ce;
+  --rho-positive: #0d7764;
+  --rho-positive-bg: #c7ebe3;
+  --rho-positive-subtle: #f8fcfb;
+  --rho-negative: #db1a2d;
+  --rho-negative-bg: #fce9ea;
+  --rho-warning: #b97800;
+  --rho-warning-bg: #fff9eb;
+  --rho-warning-border: #ffe5b2;
+  --rho-info: #1c5f80;
+  --rho-info-bg: #e1f0fa;
+  --rho-lavender: #f0edff;
+  --rho-lavender-ink: #5a4bd1;
 }
 
 @theme inline {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), var(--font-manrope), sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+  --font-wordmark: var(--font-instrument-serif), Georgia, serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-ink-2: var(--rho-ink-2);
+  --color-brand: var(--rho-brand);
+  --color-brand-hover: var(--rho-brand-hover);
+  --color-mint: var(--rho-mint);
+  --color-mint-hover: var(--rho-mint-hover);
+  --color-mint-ink: var(--rho-mint-ink);
+  --color-tint: var(--rho-tint);
+  --color-strong: var(--rho-strong);
+  --color-positive: var(--rho-positive);
+  --color-positive-bg: var(--rho-positive-bg);
+  --color-positive-subtle: var(--rho-positive-subtle);
+  --color-negative: var(--rho-negative);
+  --color-negative-bg: var(--rho-negative-bg);
+  --color-warning: var(--rho-warning);
+  --color-warning-bg: var(--rho-warning-bg);
+  --color-warning-border: var(--rho-warning-border);
+  --color-info: var(--rho-info);
+  --color-info-bg: var(--rho-info-bg);
+  --color-lavender: var(--rho-lavender);
+  --color-lavender-ink: var(--rho-lavender-ink);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-arrive: arrive 2.4s ease-out;
+  @keyframes arrive {
+    0% { background-color: color-mix(in srgb, var(--rho-mint) 55%, white); }
+    100% { background-color: transparent; }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-size: 15px;   /* Rho's app uses 15px body text */
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }

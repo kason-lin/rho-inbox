@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // `npm run build:check` builds into .next-build so it can run while `npm run dev` is using .next.
+  // (Two builds writing to the same folder corrupt the dev server.)
+  distDir: process.env.NEXT_DIST_DIR || ".next",
 };
 
 export default nextConfig;

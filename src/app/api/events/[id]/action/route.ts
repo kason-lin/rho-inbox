@@ -22,11 +22,14 @@ export const POST = route(async (req: Request, { params }: { params: Promise<{ i
   const check = canTakeAction(event, body.data.action);
   if (!check.ok) return error(check.error, 409);
 
+  const db = adminClient();
+  const user = await getUser(db, body.data.as ?? 'maya');
+  if (!user) return error('Unknown user', 404);
+  // Same guardrail as Check-in: money actions need an admin.
+  if (user.role !== 'admin') return error(`${user.name} can't ${body.data.action} this. An admin (Maya Chen or Jordan Ellis) has to.`, 403);
+
   const cardId = event.meta.checkin_card_id;
   if (typeof cardId === 'string' && event.type.startsWith('checkin_')) {
-    const db = adminClient();
-    const user = await getUser(db, body.data.as ?? 'maya');
-    if (!user) return error('Unknown user', 404);
     const result = await decideCard(db, cardId, 'approve', user);
     return result.ok ? json(result) : error(result.error, result.status);
   }

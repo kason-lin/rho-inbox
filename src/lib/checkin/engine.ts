@@ -327,7 +327,8 @@ function burnChange(x: Ctx): CardDraft[] {
 
   const months = [...x.s.burn].sort((a, b) => a.month.localeCompare(b.month)).slice(-3);
   const last = months[months.length - 1];
-  const categories = Object.keys(last.by_category);
+  // jsonb doesn't keep key order, so sort biggest first rather than trusting the stored order.
+  const categories = Object.keys(last.by_category).sort((a, b) => (last.by_category[b] ?? 0) - (last.by_category[a] ?? 0));
   const avgFor = (c: string) => round2(sum(months.map(m => m.by_category[c] ?? 0)) / months.length);
   const projectedFor = (c: string) => round2((last.by_category[c] ?? 0) + sum(x.s.changes.filter(k => k.category === c).map(k => k.monthly_delta)));
   const pct = Math.round(Math.abs(change) * 100);

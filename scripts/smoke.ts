@@ -38,7 +38,7 @@ async function main() {
   check('3 cards, in the spec order', monday.cards.map(c => c.type).join() === 'payday_guard,subscription_review,burn_change',
     monday.cards.map(c => c.title).join(' | '));
   check('"14 other things look fine"', monday.others.length === 14, `${monday.others.length}`);
-  const [payday, mixpanel, burn] = monday.cards;
+  const [payday, mixpanel] = monday.cards;
   check('payday card prepares a $5,000 transfer', payday.question === 'Move $5,000 from treasury?' && payday.action?.kind === 'transfer');
   check('cards show when their data was updated', !!payday.data_as_of);
 
