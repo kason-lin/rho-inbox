@@ -19,11 +19,12 @@ const cents = (rng: Rng, min: number, max: number) => Math.round((min + rng() * 
 const daysFrom = (now: Date, days: number) => new Date(now.getTime() + days * 86_400_000).toISOString();
 
 export const CARDHOLDERS = [
-  { name: 'Priya Shah', typical: 140 },
-  { name: 'Marcus Webb', typical: 85 },
-  { name: 'Elena Ruiz', typical: 220 },
-  { name: 'Theo Park', typical: 60 },
-  { name: 'Dana Okafor', typical: 310 },
+  { name: 'Maya Chen', typical: 180 },
+  { name: 'Jordan Ellis', typical: 140 },
+  { name: 'Ana Costa', typical: 120 },
+  { name: 'Priya Shah', typical: 90 },
+  { name: 'Sam Rivera', typical: 60 },
+  { name: 'Leo Martins', typical: 75 },
 ] as const;
 
 const CARD_MERCHANTS = [
@@ -39,24 +40,22 @@ const CARD_MERCHANTS = [
 ] as const;
 
 const BILL_VENDORS = [
-  { name: 'Amazon Web Services', min: 3200, max: 6800 },
-  { name: 'Gusto', min: 1200, max: 2400 },
-  { name: 'WeWork', min: 8500, max: 12500 },
-  { name: 'Salesforce', min: 2100, max: 3900 },
-  { name: 'Snowflake', min: 1800, max: 5200 },
-  { name: 'Cooley LLP', min: 4500, max: 9800 },
+  { name: 'Cooley LLP', min: 2400, max: 5200 },
+  { name: 'WeWork', min: 4200, max: 5400 },
+  { name: 'Carta', min: 800, max: 1600 },
+  { name: 'Pilot (bookkeeping)', min: 650, max: 1200 },
+  { name: 'Embroker', min: 900, max: 2100 },
 ] as const;
 
 export const CUSTOMERS = [
-  'Northwind Logistics', 'Acme Robotics', 'Halcyon Health', 'Parcel & Co',
-  'Lumen Analytics', 'Vector Freight', 'Orbit Studios',
+  'Northwind Logistics', 'Halcyon Health', 'Parcel & Co', 'Lumen Analytics', 'Orbit Studios',
 ] as const;
 
 const APPROVAL_KINDS = [
   { what: 'Expense reimbursement', min: 48, max: 640 },
-  { what: 'Card limit increase', min: 2000, max: 10000 },
+  { what: 'Card limit increase', min: 1000, max: 5000 },
   { what: 'New vendor: Retool', min: 1200, max: 1200 },
-  { what: 'Bill over $5,000', min: 5000, max: 14000 },
+  { what: 'Bill over $3,000', min: 3000, max: 6000 },
 ] as const;
 
 export const SCENARIOS = [
@@ -161,7 +160,7 @@ export function advanceInvoice(last: Pick<InboxEvent, 'type' | 'amount' | 'count
 
 export function treasuryUpdate(rng: Rng, opts: { lowCash?: boolean } = {}): NewEvent {
   if (opts.lowCash) {
-    const burn = cents(rng, 380000, 460000);
+    const burn = cents(rng, 90000, 100000);
     const balance = cents(rng, burn * 1.1, burn * 1.6);
     return {
       source: 'treasury',
@@ -175,7 +174,7 @@ export function treasuryUpdate(rng: Rng, opts: { lowCash?: boolean } = {}): NewE
       meta: { balance, monthly_burn: burn },
     };
   }
-  const yieldAmt = cents(rng, 800, 1600);
+  const yieldAmt = cents(rng, 820, 960);   // ~4.4% on ~$1M in Treasury, weekly
   return {
     source: 'treasury',
     type: 'yield_credited',

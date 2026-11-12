@@ -4,6 +4,18 @@ export function formatUSD(amount: number | null | undefined): string {
   return amount == null ? '' : usd.format(amount);
 }
 
+const usdWhole = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+/** "$4,200" for whole dollars, "$4,212.50" otherwise. For headlines. */
+export function formatUSDShort(amount: number): string {
+  return Number.isInteger(amount) ? usdWhole.format(amount) : usd.format(amount);
+}
+
+/** 12.0 → "12", 10.714 → "10.7" */
+export function oneDecimal(n: number): string {
+  return String(Number(n.toFixed(1)));
+}
+
 const DAY = 86_400_000;
 
 /** Gmail-style relative time: "just now", "12m ago", "2h ago", "Yesterday", "Mon", "Nov 3". */

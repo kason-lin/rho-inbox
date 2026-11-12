@@ -17,6 +17,12 @@ type Classifiable = Pick<NewEvent, 'source' | 'type' | 'amount' | 'due_at' | 'me
 export function classify(e: Classifiable, now: Date = new Date()): Classification {
   const fyi: Classification = { priority: 'fyi', reason: null };
 
+  // Check-in cards already passed the Check-in engine's own rules; their follow-ups are just notes.
+  if (e.type === 'checkin_followup') return fyi;
+  if (e.type.startsWith('checkin_')) {
+    return { priority: 'needs_action', reason: typeof e.meta.reason === 'string' ? e.meta.reason : 'From your Check-in' };
+  }
+
   switch (e.source) {
     case 'approvals':
       if (e.type === 'approval_requested') {

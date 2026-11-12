@@ -18,7 +18,14 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "pitch-mock/**",
     ],
+  },
+  {
+    rules: {
+      // `const { id: _id, ...rest } = row` is how we drop a field; that's not an unused variable.
+      "@typescript-eslint/no-unused-vars": ["warn", { ignoreRestSiblings: true, varsIgnorePattern: "^_" }],
+    },
   },
 ];
 
