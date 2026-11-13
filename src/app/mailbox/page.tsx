@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { PresenterBar } from '@/components/health/presenter-bar';
-import { Btn, Chip } from '@/components/health/ui';
+import { Btn } from '@/components/health/ui';
 import { healthPost, useHealth } from '@/components/health/use-health';
 import { DEMO_DATES } from '@/lib/health/data';
 import type { Email } from '@/lib/health/data';
