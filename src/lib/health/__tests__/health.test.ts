@@ -26,23 +26,23 @@ describe('inbox → invoice', () => {
 describe('forecast and alert on Nov 18', () => {
   const invoices = invoicesFor(nov18);
 
-  it('checking is $35,200 before the invoice and $19,800 short on Dec 2', () => {
+  it('checking is $36,000 before the invoice and $19,000 short on Dec 2', () => {
     const f = forecast(invoices, null);
-    expect(f.series.find(p => p.date === '2026-12-01')?.balance).toBe(35200);
-    expect(f.low).toEqual({ date: '2026-12-02', balance: -19800 });
-    expect(f.shortfall).toBe(19800);
+    expect(f.series.find(p => p.date === '2026-12-01')?.balance).toBe(36000);
+    expect(f.low).toEqual({ date: '2026-12-02', balance: -19000 });
+    expect(f.shortfall).toBe(19000);
   });
 
   it('the alert reads exactly as in the spec', () => {
-    expect(alertFor(invoices, DEMO_DATES.alert)?.text).toBe('A $55K invoice is due in 14 days. Checking will be $19,800 short.');
+    expect(alertFor(invoices, DEMO_DATES.alert)?.text).toBe('A $55K invoice is due in 14 days. Checking will be $19,000 short.');
   });
 
   it('suggests setting aside $25,000 and paying on Dec 2; that closes the gap', () => {
-    const plan = suggestedPlan(invoices[0], 19800);
+    const plan = suggestedPlan(invoices[0], 19000);
     expect(plan).toEqual({ transfer_amount: 25000, pay_date: '2026-12-02' });
     const after = forecast(invoices, plan, DEMO_DATES.alert);
     expect(after.shortfall).toBe(0);
-    expect(after.series.at(-1)?.balance).toBe(5200);
+    expect(after.series.at(-1)?.balance).toBe(6000);
   });
 
   it('rejects plans that move too much or pay late', () => {
@@ -62,7 +62,7 @@ describe('needs you', () => {
   it('before approval: the invoice first, then the unused tool, then spend by purpose', () => {
     const v = healthView(nov18);
     expect(v.needs_you.cards.map(c => c.type)).toEqual(['money_owed', 'subscription', 'spend']);
-    expect(v.needs_you.cards[0].title).toBe('$55K invoice from Northbeam Studio due Dec 2. Checking will be $19,800 short.');
+    expect(v.needs_you.cards[0].title).toBe('$55K invoice from Northbeam Studio due Dec 2. Checking will be $19,000 short.');
     expect(v.needs_you.others).toBe(14);
   });
 
@@ -71,7 +71,7 @@ describe('needs you', () => {
     expect(v.needs_you.cards.map(c => c.type)).toEqual(['duplicate', 'subscription', 'spend']);
     expect(v.needs_you.handled.map(c => c.type)).toEqual(['money_owed']);
     expect(v.forecast?.shortfall).toBe(0);
-    expect(v.forecast_before?.shortfall).toBe(19800);
+    expect(v.forecast_before?.shortfall).toBe(19000);
   });
 
   it('cancelling the tool and disputing the charge mark them handled', () => {
@@ -85,7 +85,7 @@ describe('needs you', () => {
   });
 
   it('KPIs: burn up 12%, runway 10.7 months (was 12)', () => {
-    expect(healthView(nov18).kpis).toMatchObject({ checking: 62400, burn: 115920, burn_change: 12, runway: 10.7, runway_was: 12 });
+    expect(healthView(nov18).kpis).toMatchObject({ checking: 63200, burn: 115920, burn_change: 12, runway: 10.7, runway_was: 12 });
   });
 });
 

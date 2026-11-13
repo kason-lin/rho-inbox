@@ -39,24 +39,24 @@ async function main() {
 
   await call('POST', '/api/health/state', { date: '2026-11-18' });
   const nov18 = (await call('GET', '/api/health/forecast')).body;
-  check('2. Nov 18 alert text matches the spec', nov18.alert?.text === 'A $55K invoice is due in 14 days. Checking will be $19,800 short.', nov18.alert?.text);
-  check('3. forecast: $19,800 short on Dec 2', nov18.forecast.shortfall === 19800 && nov18.forecast.low.date === '2026-12-02');
+  check('2. Nov 18 alert text matches the spec', nov18.alert?.text === 'A $55K invoice is due in 14 days. Checking will be $19,000 short.', nov18.alert?.text);
+  check('3. forecast: $19,000 short on Dec 2', nov18.forecast.shortfall === 19000 && nov18.forecast.low.date === '2026-12-02');
   check('   every timeline item has a source link', nov18.forecast.events.every((e: { source: { href: string } }) => e.source.href.startsWith('/')));
   check('   needs you: money owed, unused tool, spend', nov18.needs_you.cards.map((c: { type: string }) => c.type).join() === 'money_owed,subscription,spend');
   check('   invoice line items add up to $55,000', nov18.invoice.lines.reduce((t: number, l: { amount: number }) => t + l.amount, 0) === 55000);
 
   const preview = (await call('GET', '/api/health/forecast?transfer=15000&pay_date=2026-12-02')).body.preview;
-  check('4. editing to $15K previews a $4,800 gap', preview.shortfall === 4800);
+  check('4. editing to $15K previews a $4,000 gap', preview.shortfall === 4000);
   check('   a teammate can’t approve', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'ana' })).status === 403);
   check('   paying after the due date is refused', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-03', as: 'eric' })).status === 422);
   const approved = await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'eric' });
   check('   approve $25K + pay Dec 2: gap gone', approved.status === 200 && approved.body.forecast.shortfall === 0, `lowest ${approved.body.forecast?.low.balance}`);
   check('   invoice shows as scheduled, receipt exists', approved.body.obligations.find((o: { kind: string }) => o.kind === 'invoice').status === 'scheduled' && !!approved.body.approval.reference);
   check('   approving twice is refused', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'eric' })).status === 409);
-  check('   the Figma duplicate shows up next', approved.body.needs_you.cards[0].type === 'duplicate' && approved.body.forecast_before.shortfall === 19800);
+  check('   the Figma duplicate shows up next', approved.body.needs_you.cards[0].type === 'duplicate' && approved.body.forecast_before.shortfall === 19000);
 
   const undone = await call('POST', '/api/health/undo');
-  check('   Undo brings the gap back', undone.body.approval === null && undone.body.forecast.shortfall === 19800);
+  check('   Undo brings the gap back', undone.body.approval === null && undone.body.forecast.shortfall === 19000);
   await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'eric' });
 
   check('   a teammate can’t dispute', (await call('POST', '/api/health/act', { card_id: 'dup-figma', action: 'dispute', as: 'ana' })).status === 403);

@@ -22,9 +22,9 @@ A clickable prototype of a new **Business health** tab inside a replica of Rho's
 ## The story
 
 1. **Oct 3. The inbox.** Northbeam Studio, a design agency, emails a **$55,000 invoice** (Research and UX $38,000, Visual design $17,000) on net-60 terms. Nobody enters it anywhere.
-2. **Nov 18. The alert.** Rho sends one alert, by email or text: *"A $55K invoice is due in 14 days. Checking will be $19,800 short."* It shows the math and a "Why now" schedule.
+2. **Nov 18. The alert.** Rho sends one alert, by email or text: *"A $55K invoice is due in 14 days. Checking will be $19,000 short."* It shows the math and a "Why now" schedule.
 3. **The Business health tab.** It has five parts:
-   - **KPI tiles:** checking, lowest checking in the next 2 weeks (−$19,800), burn, runway.
+   - **KPI tiles:** checking, lowest checking in the next 2 weeks (−$19,000), burn, runway.
    - **Coming up:** a projected-checking chart, then each item with a link to its source: payroll, Stripe payouts (with "What's inside"), and the invoice.
    - **Needs you:** 3 cards at most, urgent first. Each card has "Not now", "This is wrong" (asks why) and "Talk to a specialist".
    - **Where it goes:** AI, cloud and tool spend by purpose for Claude, AWS, OpenAI and SaaS tools, with a match check against what Rho paid.
@@ -47,7 +47,7 @@ All sample data is in plain JSON files in `src/data/business-health/`. Each file
 
 | File | What's in it |
 | --- | --- |
-| `company.json` | Balances (checking $62,400, treasury $1,180,000), payroll, burn, the unused tool, the Figma duplicate, metrics preview |
+| `company.json` | Balances (checking $63,200, treasury $1,180,000), payroll, burn, the unused tool, the Figma duplicate, metrics preview |
 | `inbox.json` | The mock inbox. The Northbeam email holds the invoice amount, line items, date and terms in plain text |
 | `stripe-payouts.json` | Expected Stripe payouts before the due date, and what's inside each |
 | `ai-usage.json` | Claude usage records tagged by project and purpose. They must add up to the card charge |
