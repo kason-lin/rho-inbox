@@ -13,8 +13,8 @@ A clickable prototype of a new **Business health** tab inside a replica of Rho's
 | ![Inbox](docs/screenshots/01-inbox.png) | ![Alert](docs/screenshots/02-alert-email.png) | ![Proof](docs/screenshots/05-proof.png) |
 | **Confirm (2 steps)** | **Covered** | **Where it goes** |
 | ![Confirm](docs/screenshots/06-confirm.png) | ![Covered](docs/screenshots/07-covered.png) | ![Where it goes](docs/screenshots/08-where-it-goes.png) |
-| **Connected tools** | **iPhone mode** | **Alert by text** |
-| ![Connected tools](docs/screenshots/09-connected-tools.png) | ![iPhone](docs/screenshots/10-iphone.png) | ![Text](docs/screenshots/03-alert-text.png) |
+| **Connected tools** | **iPhone mode** | **The alert arrives** |
+| ![Connected tools](docs/screenshots/09-connected-tools.png) | ![iPhone](docs/screenshots/10-iphone.png) | ![Alert arrives](docs/screenshots/01b-alert-arrives.png) |
 
 - **Demo script (90 seconds):** [docs/demo-script.md](docs/demo-script.md)
 - **How it plugs into Rho:** [docs/architecture.md](docs/architecture.md)
@@ -22,7 +22,7 @@ A clickable prototype of a new **Business health** tab inside a replica of Rho's
 ## The story
 
 1. **Oct 3. The inbox.** Northbeam Studio, a design agency, emails a **$55,000 invoice** (Research and UX $38,000, Visual design $17,000) on net-60 terms. Nobody enters it anywhere.
-2. **Nov 18. The alert.** Rho sends one alert, by email or text: *"A $55K invoice is due in 14 days. Checking will be $19,000 short."* It shows the math and a "Why now" schedule.
+2. **Nov 18. The alert.** Jump the demo date and Rho's alert lands in the same inbox, with a new-mail notification: *"A $55K invoice is due in 14 days. Checking will be $19,000 short."* The email shows the math and a **Review in Rho** button.
 3. **The Business health tab.** It has five parts:
    - **KPI tiles:** checking, lowest checking in the next 2 weeks (−$19,000), burn, runway.
    - **Coming up:** a projected-checking chart, then each item with a link to its source: payroll, Stripe payouts (with "What's inside"), and the invoice.

@@ -13,7 +13,6 @@ import { healthPost, useHealth } from './use-health';
 
 const STEPS = [
   { href: '/mailbox', label: 'Inbox' },
-  { href: '/alert', label: 'Alert' },
   { href: '/business-health', label: 'Business health' },
   { href: '/settings/connected-tools', label: 'Connected tools' },
   { href: '/iphone', label: 'iPhone' },

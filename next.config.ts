@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
       ...['/checkin', '/checkin/:id*', '/inbox', '/audit', '/architecture', '/business-health/proof', '/business-health/done', '/business-health/spend']
         .map(source => ({ source, destination: '/business-health', permanent: false })),
       { source: '/business-health/connect', destination: '/settings/connected-tools', permanent: false },
-      { source: '/mail', destination: '/alert', permanent: false },
+      { source: '/mail', destination: '/mailbox', permanent: false },
+      { source: '/alert', destination: '/mailbox?email=rho-alert', permanent: false },
     ];
   },
 };

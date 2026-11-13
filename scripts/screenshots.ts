@@ -33,19 +33,17 @@ async function main() {
   await page.getByText('Rho found an invoice').waitFor();
   await shot(page, '01-inbox');
 
-  // 2. Jump to Nov 18 → the alert (email, then text)
+  // 2. Jump to Nov 18 → the alert email arrives, with a notification
   await page.getByRole('button', { name: 'Jump to Wed, Nov 18 →' }).click();
   await page.waitForURL('**/mailbox?new=1');
   await page.getByText('Rho · alerts@rho.co').waitFor();
   await shot(page, '01b-alert-arrives');
-  await page.goto(`${BASE}/alert`);
-  await page.getByText('Why now').waitFor();
-  await shot(page, '03-alert-text');
-  await page.getByRole('button', { name: 'Email', exact: true }).click();
+  await page.getByText('Rho · alerts@rho.co').click();
+  await page.getByText('Short on Dec 2').waitFor();
   await shot(page, '02-alert-email');
 
   // 3. Review → Business health tab
-  await page.getByRole('link', { name: 'Review in Rho →' }).click();
+  await page.getByRole('link', { name: 'Review in Rho', exact: true }).click();
   await page.getByText('Needs you').first().waitFor();
   await shot(page, '04-business-health', true);
 

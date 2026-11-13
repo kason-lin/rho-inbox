@@ -10,14 +10,14 @@
 2. Click **Reset demo** in the dark bar at the top. It should say **Oct 3**.
 3. Turn on Do Not Disturb. Zoom the browser to 110% if the room is big.
 
-The dark bar is for you, the presenter. It shows the steps in order (Inbox, Alert, Business health, Connected tools, iPhone), the demo date and Reset.
+The dark bar is for you, the presenter. It shows the steps in order (Inbox, Business health, Connected tools, iPhone), the demo date and Reset.
 
 ## The script
 
 | Time | Click | Say |
 | --- | --- | --- |
 | **0:00** | Open the **Northbeam Studio** email | "October 3rd: our design agency sends a $55,000 invoice for the app redesign, due in 60 days. It's not in Rho Bills, nobody forwards it. It isn't in the bank yet, so no banking app knows it exists." |
-| **0:12** | **Jump to Wed, Nov 18 →** | "Six weeks later, two weeks before it's due, a new email lands: Rho's alert. Not a digest: one alert, because a decision is due." Click the notification to open it, point at the math: "$63,200 today, payroll, Stripe payouts, the invoice: $19,000 short." (Bar → **2 Alert** shows the same alert as a text.) |
+| **0:12** | **Jump to Wed, Nov 18 →** | "Six weeks later, two weeks before it's due, a new email lands: Rho's alert. Not a digest: one alert, because a decision is due." Click the notification to open it, point at the math: "$63,200 today, payroll, Stripe payouts, the invoice: $19,000 short." |
 | **0:25** | **Review in Rho** in the email | "This is Business health, a new tab next to Home. Lowest checking in the next two weeks: minus $19,000, on December 2nd." |
 | **0:32** | Point at **Coming up** | "Every line links to its source: Gusto, Stripe, the email itself." |
 | **0:38** | **Show proof** | "Rho shows its work: the invoice with its line items, the email it came from, the math, and the rule that flagged it." |
@@ -30,7 +30,7 @@ The dark bar is for you, the presenter. It shows the steps in order (Inbox, Aler
 
 ## If something goes wrong
 
-- **The alert says "No alert yet":** the date is still Oct 3. Click **Nov 18** in the bar.
+- **No Rho email in the inbox:** the date is still Oct 3. Click **Nov 18** in the bar.
 - **The invoice card is already crossed out:** you approved in an earlier run. Click **Reset demo**, or **Undo** on the toast.
 - **A page looks empty:** refresh it. The demo state lives in your browser, so it survives refreshes.
 

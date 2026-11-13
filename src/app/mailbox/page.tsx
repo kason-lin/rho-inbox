@@ -179,10 +179,9 @@ function AlertNarration() {
       <div>
         <div className="font-mono text-[11px] tracking-[0.08em] text-[#048d73] uppercase">Wed, Nov 18 · 8:00 AM · 14 days before the due date</div>
         <p className="text-[15px] font-semibold">Six weeks later, Rho sends one alert. Not a digest: one alert, because a decision is due.</p>
-        <p className="text-[13px] text-[#5f6368]">The founder picks email or text.</p>
+        <p className="text-[13px] text-[#5f6368]">It lands right in the inbox the founder already reads.</p>
       </div>
       <div className="flex gap-2">
-        <Link href="/alert"><Btn>See it as a text</Btn></Link>
         <Link href={`/mailbox?email=${ALERT_ID}`}><Btn variant="mint">Open the alert →</Btn></Link>
       </div>
     </div>

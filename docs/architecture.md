@@ -31,7 +31,7 @@ src/lib/health/                    the logic, pure functions
         │
 src/app/api/health/                real API routes (forecast, approve, act, undo, feedback, state, reset…)
         │
-pages: /mailbox → /alert → /business-health → /settings/connected-tools, and /iphone
+pages: /mailbox (invoice, then the alert email) → /business-health → /settings/connected-tools, and /iphone
 ```
 
 **Demo state.** Each viewer's state (demo date, connected tools, approval, handled cards, feedback) lives in a cookie. Viewers never affect each other, there's no database, and Reset just clears the cookie.
