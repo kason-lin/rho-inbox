@@ -10,8 +10,8 @@ const dmMono = DM_Mono({ variable: '--font-dm-mono', subsets: ['latin'], weight:
 const serif = Instrument_Serif({ variable: '--font-instrument-serif', subsets: ['latin'], weight: '400' });
 
 export const metadata: Metadata = {
-  title: 'Rho Inbox · Check-in prototype',
-  description: 'Hackathon prototype: one inbox for every Rho product, plus a weekly Check-in with decisions ready to approve.',
+  title: 'Rho · Business health prototype',
+  description: 'Case-competition prototype: a Business health tab for Rho that sees money owed before it reaches the bank.',
   robots: { index: false, follow: false },   // a demo, not a site to be found in search
 };
 

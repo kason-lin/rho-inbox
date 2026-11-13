@@ -1,0 +1,56 @@
+{
+  "_about": "The other bills shown in 'Where it goes', already split by purpose. 'reported' is what the provider's usage report says; 'paid' is what Rho actually paid. Sample data.",
+  "purposes": {
+    "building": "Building (R&D)",
+    "running": "Running the product (cost of revenue)",
+    "ops": "Operations",
+    "unassigned": "Unassigned"
+  },
+  "providers": [
+    {
+      "name": "AWS",
+      "slices": [
+        {
+          "purpose": "running",
+          "amount": 9800
+        },
+        {
+          "purpose": "building",
+          "amount": 4200
+        }
+      ],
+      "reported": 14000,
+      "paid": 14000
+    },
+    {
+      "name": "OpenAI",
+      "slices": [
+        {
+          "purpose": "running",
+          "amount": 3300
+        },
+        {
+          "purpose": "unassigned",
+          "amount": 2700
+        }
+      ],
+      "reported": 5700,
+      "paid": 6000
+    },
+    {
+      "name": "SaaS tools (23)",
+      "slices": [
+        {
+          "purpose": "ops",
+          "amount": 5600
+        },
+        {
+          "purpose": "unassigned",
+          "amount": 3400
+        }
+      ],
+      "reported": null,
+      "paid": 9000
+    }
+  ]
+}

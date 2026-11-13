@@ -57,30 +57,60 @@ describe('forecast and alert on Nov 18', () => {
 });
 
 describe('needs you', () => {
-  it('3 cards: money owed first, then the unused $50 tool, then burn 12 → 10.7 months', () => {
-    const view = healthView(nov18);
-    expect(view.needs_you.cards.map(c => c.type)).toEqual(['money_owed', 'subscription', 'burn']);
-    expect(view.needs_you.cards[2].title).toBe('Burn up 12%: runway 12 → 10.7 months.');
-    expect(view.needs_you.others).toBe(14);
+  const approved = { ...nov18, approval: { transfer_amount: 25000, pay_date: '2026-12-02', approved_at: '', approved_by: 'Kason Lin', reference: 'BH-1' } };
+
+  it('before approval: the invoice first, then the unused tool, then spend by purpose', () => {
+    const v = healthView(nov18);
+    expect(v.needs_you.cards.map(c => c.type)).toEqual(['money_owed', 'subscription', 'spend']);
+    expect(v.needs_you.cards[0].title).toBe('$55K invoice from Northbeam Studio due Dec 2. Checking will be $19,800 short.');
+    expect(v.needs_you.others).toBe(14);
   });
 
-  it('after approval the money-owed card is gone', () => {
-    const approved = { ...nov18, approval: { transfer_amount: 25000, pay_date: '2026-12-02', approved_at: '', approved_by: 'Kason Lin', reference: 'BH-1' } };
-    expect(healthView(approved).needs_you.cards.map(c => c.type)).toEqual(['subscription', 'burn']);
-    expect(healthView(approved).forecast?.shortfall).toBe(0);
+  it('after approval the invoice is handled and the Figma duplicate moves up', () => {
+    const v = healthView(approved);
+    expect(v.needs_you.cards.map(c => c.type)).toEqual(['duplicate', 'subscription', 'spend']);
+    expect(v.needs_you.handled.map(c => c.type)).toEqual(['money_owed']);
+    expect(v.forecast?.shortfall).toBe(0);
+    expect(v.forecast_before?.shortfall).toBe(19800);
+  });
+
+  it('cancelling the tool and disputing the charge mark them handled', () => {
+    const v = healthView({ ...approved, handled: { 'sub-miro': 'cancelled', 'dup-figma': 'disputed' } });
+    expect(v.needs_you.cards.map(c => c.type)).toEqual(['spend']);
+    expect(v.needs_you.handled.map(c => c.handled_text)).toContain('Miro cancelled and card locked · saves $600 a year');
   });
 
   it('muted cards disappear', () => {
-    expect(needsYou(null, false, ['burn']).cards.map(c => c.type)).toEqual(['subscription']);
+    expect(needsYou(null, { ...nov18, muted: ['sub-miro'] }).cards.map(c => c.type)).toEqual(['spend']);
+  });
+
+  it('KPIs: burn up 12%, runway 10.7 months (was 12)', () => {
+    expect(healthView(nov18).kpis).toMatchObject({ checking: 62400, burn: 115920, burn_change: 12, runway: 10.7, runway_was: 12 });
+  });
+});
+
+describe('inbox invoice details', () => {
+  it('pulls out the line items, which add up to the amount due', () => {
+    const [inv] = invoicesFor(nov18);
+    expect(inv.lines).toEqual([{ label: 'Research and UX', amount: 38000 }, { label: 'Visual design and prototype', amount: 17000 }]);
+    expect(inv.lines.reduce((t, l) => t + l.amount, 0)).toBe(inv.amount);
   });
 });
 
 describe('spend by purpose', () => {
   it('Claude $50,000 = $32,000 building + $18,000 running, matching the card charge exactly', () => {
+    const { claude } = spendByPurpose();
+    expect(claude.charge.amount).toBe(50000);
+    expect(claude.purposes.map(p => [p.label, p.amount])).toEqual([['Building the product', 32000], ['Running the product for customers', 18000]]);
+    expect(claude.matches_charge).toBe(true);
+    expect(claude.purposes.flatMap(p => p.projects).reduce((t, p) => t + p.amount, 0)).toBe(50000);
+  });
+
+  it('four providers, coverage, and the OpenAI $300 mismatch', () => {
     const s = spendByPurpose();
-    expect(s.charge.amount).toBe(50000);
-    expect(s.purposes.map(p => [p.label, p.amount])).toEqual([['Building the product', 32000], ['Running the product for customers', 18000]]);
-    expect(s.matches_charge).toBe(true);
-    expect(s.purposes.flatMap(p => p.projects).reduce((t, p) => t + p.amount, 0)).toBe(50000);
+    expect(s.providers.map(p => [p.name, p.total])).toEqual([['Claude (Anthropic)', 50000], ['AWS', 14000], ['OpenAI', 6000], ['SaaS tools (23)', 9000]]);
+    expect(Math.round(s.coverage * 100)).toBe(92);
+    expect(s.match.find(m => m.name === 'OpenAI')?.difference).toBe(300);
+    expect(s.match.find(m => m.name === 'Anthropic')?.difference).toBe(0);
   });
 });

@@ -85,5 +85,7 @@
       "amount": 3750,
       "period": "Nov 8–14"
     }
-  ]
+  ],
+  "label_rule": "Building = API keys named dev-* plus Claude Code seats (R&D). Running = the prod-agent key that serves customers (cost of revenue). The founder sets these labels once.",
+  "reported_by_provider": 50000
 }

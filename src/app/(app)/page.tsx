@@ -62,10 +62,10 @@ export default function Home() {
           )}
           {health?.needs_you.cards.map((c, i) => (
             <li key={c.id}>
-              <Link href={c.href} className="flex items-center gap-4 px-5 py-3 text-[13px] hover:bg-[#f7f9f8]">
+              <Link href="/business-health" className="flex items-center gap-4 px-5 py-3 text-[13px] hover:bg-[#f7f9f8]">
                 <span className="w-3 text-muted-foreground">{i + 1}</span>
                 {c.urgent && <span className="rounded bg-negative-bg px-1.5 py-px text-[10px] font-semibold text-negative">Urgent</span>}
-                <span className="flex-1"><span className="font-semibold">{c.title}</span>{c.question ? ` ${c.question}` : ''}</span>
+                <span className="flex-1 font-semibold">{c.title}</span>
                 <ChevronRight className="size-4 text-muted-foreground" />
               </Link>
             </li>

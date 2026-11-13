@@ -4,7 +4,7 @@
  */
 import { cookies } from 'next/headers';
 import type { NextResponse } from 'next/server';
-import { DEMO_DATES } from './data';
+import { DATA, DEMO_DATES } from './data';
 import type { Plan } from './forecast';
 
 export type Approval = Plan & { approved_at: string; approved_by: string; reference: string };
@@ -14,11 +14,13 @@ export type DemoState = {
   connected: string[];      // tool ids from connections.json
   approval: Approval | null;
   muted: string[];          // cards hidden by "Not now" or "This is wrong"
+  handled: Record<string, 'cancelled' | 'disputed'>;   // cards acted on (other than the approval)
+  feedback: { card_id: string; reason: string }[];     // "This is wrong" reasons, to tune the rules
 };
 
 const COOKIE = 'bh_state';
 
-export const FRESH: DemoState = { date: DEMO_DATES.invoiceArrives, connected: [], approval: null, muted: [] };
+export const FRESH: DemoState = { date: DEMO_DATES.invoiceArrives, connected: DATA.connections.tools.map(t => t.id), approval: null, muted: [], handled: {}, feedback: [] };
 
 export async function readState(): Promise<DemoState> {
   const raw = (await cookies()).get(COOKIE)?.value;

@@ -6,10 +6,12 @@
  */
 import { ArrowLeft, FileText, Inbox, Paperclip, Pencil, Search, Send, Sparkles, Star } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { PresenterBar } from '@/components/health/presenter-bar';
-import { useHealth } from '@/components/health/use-health';
+import { Btn, Chip } from '@/components/health/ui';
+import { healthPost, useHealth } from '@/components/health/use-health';
+import { DEMO_DATES } from '@/lib/health/data';
 import type { Email } from '@/lib/health/data';
 import { shortDay } from '@/lib/health/dates';
 import type { Invoice } from '@/lib/health/extract';
@@ -41,6 +43,7 @@ function Mailbox() {
   return (
     <div className="min-h-screen bg-[#f6f8fc] p-3 text-[#1f1f1f]">
       <PresenterBar className="mb-3" />
+      {health && health.date < DEMO_DATES.alert && data?.invoices[0] && <Narration amount={data.invoices[0].amount} />}
       <div className="flex gap-3">
         {/* left rail */}
         <aside className="hidden w-56 shrink-0 md:block">
@@ -123,16 +126,41 @@ function Mailbox() {
   );
 }
 
-/** What Rho's read-only inbox connection noticed about this email. */
-function FoundByRho({ invoice, afterAlert }: { invoice: Invoice; afterAlert: boolean }) {
+/** Presenter caption for Oct 3: what's happening, and the jump to the alert six weeks later. */
+function Narration({ amount }: { amount: number }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  async function jump() {
+    setBusy(true);
+    try { await healthPost('state', { date: DEMO_DATES.alert }); router.push('/alert'); } catch { setBusy(false); }
+  }
   return (
-    <div className="mt-5 flex flex-wrap items-center gap-3 rounded-lg border border-[#c7ebe3] bg-[#f8fcfb] px-4 py-3 text-[13px]">
-      <Sparkles className="size-4 text-[#048d73]" />
-      <span>
-        <span className="font-semibold">Rho found an invoice:</span> {invoice.vendor}, ${invoice.amount.toLocaleString()}, due {shortDay(invoice.due)} (net {invoice.terms_days}).
-        <span className="text-[#5f6368]"> Not in Rho Bills or the bank yet.</span>
-      </span>
-      <Link href={afterAlert ? '/business-health' : '/business-health#coming-up'} className="ml-auto font-semibold text-[#048d73] hover:underline">See it in Business health →</Link>
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3">
+      <div>
+        <div className="font-mono text-[11px] tracking-[0.08em] text-[#048d73] uppercase">Oct 3, 2026 · 9:14 AM</div>
+        <p className="text-[15px] font-semibold">A ${amount.toLocaleString()} invoice lands in the finance inbox. Nobody forwards it to Rho.</p>
+        <p className="text-[13px] text-[#5f6368]">It isn’t in the bank yet, so no banking app knows it exists.</p>
+      </div>
+      <Btn variant="mint" disabled={busy} onClick={() => void jump()}>Jump to Wed, Nov 18 →</Btn>
+    </div>
+  );
+}
+
+/** What Rho's read-only inbox connection noticed about this email: the invoice, its line items, and that nobody has entered it. */
+function FoundByRho({ invoice, afterAlert }: { invoice: Invoice; afterAlert: boolean }) {
+  const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  return (
+    <div className="mt-5 max-w-xl rounded-lg border border-[#c7ebe3] bg-[#f8fcfb] p-4 text-[13px]">
+      <div className="flex items-center gap-2 font-semibold"><Sparkles className="size-4 text-[#048d73]" /> Rho found an invoice <span className="font-normal text-[#5f6368]">· {invoice.number} · net {invoice.terms_days}</span></div>
+      <dl className="mt-3 rounded-md border bg-white tabular">
+        {invoice.lines.map(l => <div key={l.label} className="flex justify-between border-b px-3 py-2"><dt>{l.label}</dt><dd>{usd(l.amount)}</dd></div>)}
+        <div className="flex justify-between px-3 py-2 font-semibold"><dt>Amount due · {shortDay(invoice.due)}, {invoice.due.slice(0, 4)}</dt><dd>{usd(invoice.amount)}</dd></div>
+      </dl>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Chip tone="amber">Not in Rho Bills</Chip>
+        <Chip>Not forwarded</Chip>
+        <Link href="/business-health" className="ml-auto font-semibold text-[#048d73] hover:underline">{afterAlert ? 'Review in Business health →' : 'See it in Business health →'}</Link>
+      </div>
     </div>
   );
 }

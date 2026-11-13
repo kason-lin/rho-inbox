@@ -4,22 +4,94 @@
   "people": 12,
   "forecast_start": "2026-11-18",
   "forecast_end": "2026-12-02",
-  "checking": { "name": "Checking", "last4": "4821", "balance": 62400 },
-  "treasury": { "name": "Treasury", "last4": "7310", "balance": 1180000 },
+  "checking": {
+    "name": "Checking",
+    "last4": "4821",
+    "balance": 62400
+  },
+  "treasury": {
+    "name": "Treasury",
+    "last4": "7310",
+    "balance": 1180000
+  },
   "payroll": [
-    { "id": "payroll-2026-11-20", "date": "2026-11-20", "amount": 41200, "label": "Friday payroll", "detail": "12 people, paid every other Friday (from Gusto)" }
+    {
+      "id": "payroll-2026-11-20",
+      "date": "2026-11-20",
+      "amount": 41200,
+      "label": "Friday payroll",
+      "detail": "12 people, paid every other Friday (from Gusto)"
+    }
   ],
   "bills": [],
   "burn": {
     "three_month_average": 103500,
     "projected": 115920,
     "drivers": [
-      { "label": "2 new hires starting Dec 1", "monthly": 9900, "source": "Gusto" },
-      { "label": "A raise found in a signed contract email", "monthly": 2520, "source": "Gmail" }
-    ]
+      {
+        "label": "2 new hires starting Dec 1",
+        "monthly": 9900,
+        "source": "Gusto"
+      },
+      {
+        "label": "A raise found in a signed contract email",
+        "monthly": 2520,
+        "source": "Gmail"
+      }
+    ],
+    "runway_was": 12.0
   },
   "subscriptions": [
-    { "id": "sub-miro", "vendor": "Miro", "monthly": 50, "card_last4": "5520", "card_owner": "Ana Costa", "last_login_days": 60 }
+    {
+      "id": "sub-miro",
+      "vendor": "Miro",
+      "monthly": 50,
+      "card_last4": "6094",
+      "card_owner": "Leo Martins",
+      "owner_left": "September",
+      "last_login_days": 60,
+      "source": "Google Workspace logins"
+    }
   ],
-  "other_checks": 14
+  "other_checks": 14,
+  "duplicate_charge": {
+    "_about": "A duplicate card charge. reveal=after_approval makes it show up as the next card once the invoice is handled (scripted for the demo).",
+    "id": "dup-figma",
+    "vendor": "Figma",
+    "amount": 1440,
+    "card_last4": "2291",
+    "card_owner": "Design team",
+    "charges": [
+      "2026-11-06",
+      "2026-11-15"
+    ],
+    "evidence": "2 receipts with the same invoice number",
+    "reveal": "after_approval"
+  },
+  "metrics_preview": {
+    "_about": "Shown as 'Your metrics: coming next'. Not calculated, just a preview of the next phase.",
+    "items": [
+      {
+        "label": "ARR (Stripe subscriptions)",
+        "value": "$1.42M",
+        "note": "up 9% month over month"
+      },
+      {
+        "label": "Revenue vs. deposits, Nov",
+        "value": "$118K",
+        "note": "of $121K deposited"
+      },
+      {
+        "label": "Gross margin",
+        "value": "71%",
+        "note": "$19 plan, $5.40 AI cost"
+      },
+      {
+        "label": "Net burn",
+        "value": "$115,920",
+        "note": "incl. salaries"
+      }
+    ]
+  },
+  "data_updated": "6 min ago"
 }

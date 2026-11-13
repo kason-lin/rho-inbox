@@ -1,5 +1,5 @@
 {
-  "_about": "The tools Loop Labs connects for Business health, and exactly what each one is allowed to see. All read-only. Mock connections: nothing real is contacted.",
+  "_about": "The tools Loop Labs connects for Business health, and exactly what each one is allowed to see. All read-only, all connected at the start of the demo (Settings → Connected tools can disconnect them). Mock connections: nothing real is contacted.",
   "tools": [
     {
       "id": "inbox",
@@ -8,7 +8,10 @@
       "scopes": [
         "Read email messages (gmail.readonly)",
         "No sending, deleting or labeling"
-      ]
+      ],
+      "color": "#ea4335",
+      "account": "kason@looplabs.example",
+      "reads": "Invoices and receipts: sender, amount, due date, attachment"
     },
     {
       "id": "stripe",
@@ -17,7 +20,10 @@
       "scopes": [
         "Read payouts (read_only)",
         "Read balance (read_only)"
-      ]
+      ],
+      "color": "#635bff",
+      "account": "Loop Labs",
+      "reads": "Payouts and the fees inside them"
     },
     {
       "id": "payroll",
@@ -26,7 +32,10 @@
       "scopes": [
         "Read pay schedule (read-only)",
         "Read payroll totals, not individual salaries"
-      ]
+      ],
+      "color": "#f45d48",
+      "account": "Payroll",
+      "reads": "Pay dates and totals"
     },
     {
       "id": "ai",
@@ -35,7 +44,10 @@
       "scopes": [
         "Read usage and cost reports",
         "No access to prompts or outputs"
-      ]
+      ],
+      "color": "#d97757",
+      "account": "Usage & cost reports",
+      "reads": "Cost by API key, workspace and model"
     },
     {
       "id": "openai",
@@ -44,7 +56,10 @@
       "scopes": [
         "Read usage and cost reports",
         "No access to prompts or outputs"
-      ]
+      ],
+      "color": "#10a37f",
+      "account": "Usage & costs",
+      "reads": "Cost by project and key"
     },
     {
       "id": "aws",
@@ -53,7 +68,22 @@
       "scopes": [
         "Read Cost Explorer (ce:Get*)",
         "No changes to infrastructure"
-      ]
+      ],
+      "color": "#ff9900",
+      "account": "Cost Explorer",
+      "reads": "Cost by tag"
+    },
+    {
+      "id": "workspace",
+      "name": "Google Workspace",
+      "what": "Who uses which tool, for unused subscriptions",
+      "scopes": [
+        "Read app sign-in dates (reports.audit.readonly)",
+        "No access to files or email"
+      ],
+      "color": "#4285f4",
+      "account": "Tool logins",
+      "reads": "Who used which tool, last login"
     }
   ],
   "rho_note": "Write actions are the next step with Rho; their connection is read-only today.",
@@ -62,5 +92,17 @@
     "stripe",
     "payroll",
     "ai"
+  ],
+  "reads": [
+    "Amount, date, vendor and due date",
+    "Model, API key and project for AI costs",
+    "Pay dates and payroll totals",
+    "Last sign-in date for each tool"
+  ],
+  "never_reads": [
+    "Prompts, model outputs or thinking traces",
+    "Logs from anyone’s laptop",
+    "Emails that aren’t bills or receipts",
+    "Individual salaries"
   ]
 }

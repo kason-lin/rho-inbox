@@ -92,7 +92,7 @@ export function forecast(invoices: Invoice[], plan: Plan | null, transferDate?: 
   if (plan && plan.transfer_amount > 0) {
     events.push({
       id: 'transfer-plan', date: transferDate ?? start, amount: plan.transfer_amount, label: `Transfer from Treasury ••${company.treasury.last4}`, kind: 'transfer',
-      source: { tool: 'Rho', ref: `Treasury ••${company.treasury.last4}`, href: '/business-health/done' },
+      source: { tool: 'Rho', ref: `Treasury ••${company.treasury.last4}`, href: '/business-health' },
     });
   }
   const inWindow = events.filter(e => e.date >= start && e.date <= end).sort((a, b) => a.date.localeCompare(b.date) || b.amount - a.amount);

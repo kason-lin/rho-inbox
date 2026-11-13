@@ -14,12 +14,14 @@ export type Invoice = {
   terms_days: number;
   due: string;           // YYYY-MM-DD
   subject: string;
+  lines: { label: string; amount: number }[];   // e.g. "Research and UX: $38,000.00"
 };
 
 const AMOUNT = /amount due:\s*\$([\d,]+(?:\.\d{2})?)/i;
 const ISSUED = /invoice date:\s*([A-Za-z]+ \d{1,2}, \d{4})/i;
 const TERMS = /net\s*(\d+)/i;
 const NUMBER = /invoice:\s*([A-Z0-9-]+)/i;
+const LINE = /^([^:\n]+):\s*\$([\d,]+\.\d{2})$/gm;
 
 export function extractInvoice(email: Email): Invoice | null {
   const amount = email.body.match(AMOUNT);
@@ -37,6 +39,9 @@ export function extractInvoice(email: Email): Invoice | null {
     terms_days: terms,
     due: addDays(issuedDay, terms),
     subject: email.subject,
+    lines: [...email.body.matchAll(LINE)]
+      .filter(m => !/amount due/i.test(m[1]))
+      .map(m => ({ label: m[1].trim(), amount: Number(m[2].replace(/,/g, '')) })),
   };
 }
 

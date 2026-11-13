@@ -12,11 +12,11 @@ import { cn } from 'cn';
 import { healthPost, useHealth } from './use-health';
 
 const STEPS = [
-  { href: '/business-health/connect', label: 'Connect tools' },
   { href: '/mailbox', label: 'Inbox' },
   { href: '/alert', label: 'Alert' },
   { href: '/business-health', label: 'Business health' },
-  { href: '/business-health/spend', label: 'Where it goes' },
+  { href: '/settings/connected-tools', label: 'Connected tools' },
+  { href: '/iphone', label: 'iPhone' },
 ];
 
 export function PresenterBar({ className }: { className?: string }) {
@@ -40,7 +40,7 @@ export function PresenterBar({ className }: { className?: string }) {
     setBusy(true);
     try {
       await healthPost('reset');
-      router.push('/business-health/connect');
+      router.push('/mailbox');
     } finally {
       setBusy(false);
     }

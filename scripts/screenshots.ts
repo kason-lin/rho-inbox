@@ -25,52 +25,55 @@ async function main() {
   // Home: Rho's dashboard, with Business health on top
   await page.goto(`${BASE}/?as=kason`);
   await page.getByText('Top outflows').waitFor();
+  await page.request.post(`${BASE}/api/health/reset`);
   await shot(page, '00-home');
-
-  // Connect tools (read-only)
-  await page.goto(`${BASE}/business-health/connect`);
-  await page.getByRole('button', { name: 'Connect all (read-only)' }).click();
-  await page.getByText('Connected (read-only)').first().waitFor();
-  await shot(page, '01-connect');
 
   // 1. The invoice email (Oct 3)
   await page.goto(`${BASE}/mailbox?email=em-northbeam-invoice`);
   await page.getByText('Rho found an invoice').waitFor();
-  await shot(page, '02-inbox');
+  await shot(page, '01-inbox');
 
-  // 2. Jump to Nov 18 → the alert
-  await page.getByRole('button', { name: 'Nov 18' }).click();
+  // 2. Jump to Nov 18 → the alert (email, then text)
+  await page.getByRole('button', { name: 'Jump to Wed, Nov 18 →' }).click();
   await page.waitForURL('**/alert');
-  await page.getByText('Checking will be $19,800 short.').first().waitFor();
-  await shot(page, '03-alert');
+  await page.getByText('Why now').waitFor();
+  await shot(page, '02-alert-email');
+  await page.getByRole('button', { name: 'Text', exact: true }).click();
+  await shot(page, '03-alert-text');
 
   // 3. Review → Business health tab
-  await page.getByRole('link', { name: 'Review', exact: true }).click();
-  await page.getByText('Coming up').first().waitFor();
+  await page.getByRole('link', { name: 'Review in Rho →' }).click();
   await page.getByText('Needs you').first().waitFor();
   await shot(page, '04-business-health', true);
 
-  // Proof → approval sheet
-  await page.goto(`${BASE}/business-health/proof`);
-  await page.getByRole('button', { name: /Review the fix/ }).click();
-  await page.getByText('Gap closed.').waitFor();
-  await shot(page, '05-approval-sheet');
+  // Proof drawer, then the 2-step confirm
+  await page.getByRole('button', { name: 'Show proof' }).click();
+  await page.getByText('Why Rho flagged this').waitFor();
+  await shot(page, '05-proof');
+  await page.getByRole('dialog').getByRole('button', { name: /Set aside/ }).click();
+  await page.getByText('Confirm · 2 steps').waitFor();
+  await shot(page, '06-confirm');
 
-  // 4. Approve → done + receipt
+  // 4. Approve → covered, with the dashed "before" line and the Figma card next
   await page.getByRole('button', { name: 'Approve', exact: true }).click();
-  await page.getByText('covered and scheduled').first().waitFor();
-  await shot(page, '06-done');
+  await page.getByText('Covered. Checking now stays above zero').waitFor();
+  await shot(page, '07-covered', true);
 
-  // 5. Where it goes: tap the building slice
-  await page.goto(`${BASE}/business-health/spend`);
-  await page.getByText('Building the product').first().click();
-  await page.getByText('Tag as R&D').waitFor();
-  await shot(page, '07-spend-by-purpose');
+  // 5. Where it goes, with the Claude drill-down
+  await page.getByRole('button', { name: 'See breakdown' }).click();
+  await page.getByText('exact match').waitFor();
+  await page.locator('#where-it-goes').screenshot({ path: `${OUT}/08-where-it-goes.png` });
+  console.log(`✓ ${OUT}/08-where-it-goes.png`);
 
-  // Architecture
-  await page.goto(`${BASE}/architecture`);
-  await page.locator('svg[id^="m"]').first().waitFor({ timeout: 15_000 });
-  await shot(page, '08-architecture', true);
+  // Settings → Connected tools
+  await page.goto(`${BASE}/settings/connected-tools`);
+  await page.getByText('What Rho never reads').waitFor();
+  await shot(page, '09-connected-tools');
+
+  // iPhone mode
+  await page.goto(`${BASE}/iphone`);
+  await page.getByText('Same flow, in the Rho iOS app').waitFor();
+  await shot(page, '10-iphone');
 
   await browser.close();
 }

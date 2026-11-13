@@ -1,141 +1,191 @@
 'use client';
 /**
- * Story beat 3: the Business health tab. Three sections from the spec:
- *   Coming up   projected checking vs. everything due, with the gap highlighted
- *   Needs you   3 cards at most (the $55K invoice first)
- *   Where it goes  spend by purpose (the Claude bill)
+ * The Business health tab. Top to bottom:
+ *   KPI tiles     checking, lowest checking in the next 2 weeks, burn, runway
+ *   Coming up     projected checking (chart) and everything due, each linked to its source
+ *   Needs you     3 cards at most; the $55K invoice first
+ *   Where it goes AI, cloud and tool spend by purpose, with the match check
+ *   Your metrics  a preview of the next phase
+ * Proof opens in a side drawer; approving is a 2-step confirm with Undo.
  */
-import { AlertTriangle, ArrowRight, CheckCircle2, Clock, Plug, ThumbsDown } from 'lucide-react';
+import { CheckCircle2, Clock, Plug } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { CashChart } from '@/components/health/cash-chart';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+import { CashChart, ChartLegend } from '@/components/health/cash-chart';
+import { ComingUp } from '@/components/health/coming-up';
+import { NeedsYou } from '@/components/health/needs-you';
+import { ConfirmModal, DisputeModal, ProofDrawer, SpecialistModal } from '@/components/health/overlays';
 import { PresenterBar } from '@/components/health/presenter-bar';
-import { Receipt } from '@/components/health/receipt';
-import { Timeline } from '@/components/health/timeline';
+import { Btn, Chip } from '@/components/health/ui';
 import { healthPost, useHealth } from '@/components/health/use-health';
-import { Card, HeaderButton, PageHeader } from '@/components/shell/page-header';
-import { longDay } from '@/lib/health/dates';
-import { formatUSD } from '@/lib/format';
+import { WhereItGoes } from '@/components/health/where-it-goes';
+import { Card, HeaderButton } from '@/components/shell/page-header';
+import { DEMO_DATES } from '@/lib/health/data';
+import { longDay, shortDay } from '@/lib/health/dates';
+import type { HealthView } from '@/lib/health/view';
+import { formatUSDShort } from '@/lib/format';
 import { cn } from 'cn';
+
+type Overlay = 'proof' | 'confirm' | 'dispute' | 'specialist' | null;
 
 export default function BusinessHealthPage() {
   const { data } = useHealth();
-  const [busy, setBusy] = useState<string | null>(null);
+  const [overlay, setOverlay] = useState<Overlay>(null);
+  const [breakdown, setBreakdown] = useState(false);
+  const [wrongFor, setWrongFor] = useState<string | null>(null);
+  const close = useCallback(() => setOverlay(null), []);
 
-  async function feedback(cardId: string, kind: 'not_now' | 'wrong') {
-    setBusy(cardId);
-    try { await healthPost('feedback', { card_id: cardId, kind }); } finally { setBusy(null); }
+  function approved(view: HealthView) {
+    setOverlay(null);
+    toast.success(`The ${view.invoice ? formatUSDShort(view.invoice.amount).replace(',000', 'K') : ''} invoice is covered and scheduled.`, {
+      duration: 8000,
+      action: { label: 'Undo', onClick: () => void healthPost('undo').then(() => toast('Approval undone. Nothing moved.')) },
+    });
   }
+
+  const actions = {
+    confirm: () => setOverlay('confirm'),
+    proof: () => setOverlay('proof'),
+    dispute: () => setOverlay('dispute'),
+    specialist: () => setOverlay('specialist'),
+    breakdown: () => {
+      setBreakdown(true);
+      document.getElementById('where-it-goes')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  };
+  const moneyCard = data?.needs_you.cards.find(c => c.type === 'money_owed');
 
   return (
     <>
       <PresenterBar className="mb-6" />
-      <PageHeader
-        title="Business health"
-        subtitle={data ? <>Loop Labs · as of {longDay(data.date)} · <span className="font-medium text-ink-2">Sample data</span></> : ' '}
-        actions={<Link href="/business-health/connect"><HeaderButton><Plug /> Connected tools</HeaderButton></Link>}
-      />
 
-      {data && !data.ready && (
-        <Card className="mb-7">
-          <div className="flex items-center gap-3 px-5 py-4 text-[13px]">
-            <Clock className="size-4 text-muted-foreground" />
-            <span>
-              Rho found {data.invoice ? <>a {formatUSD(data.invoice.amount)} invoice from {data.invoice.vendor}, due {longDay(data.invoice.due)}</> : 'nothing due yet'}.
-              It’s nowhere near due, so there’s nothing to decide. Jump the demo date to <b>Nov 18</b> to see the forecast.
-            </span>
-          </div>
-        </Card>
-      )}
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase">{data?.company ?? 'Loop Labs'} · Sample data</div>
+          <h1 className="mt-1 text-[22px] leading-tight font-semibold tracking-tight">Business health</h1>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {data && <Chip>{longDay(data.date)}</Chip>}
+          {data && <Chip tone="teal">Updated {data.data_updated}</Chip>}
+          <Link href="/settings/connected-tools"><HeaderButton><Plug /> Connected tools</HeaderButton></Link>
+        </div>
+      </div>
+
+      {data && <Kpis data={data} />}
+
+      {data && !data.ready && <BeforeTheAlert data={data} />}
 
       {data?.ready && data.forecast && (
         <>
           {data.approval && (
-            <div className="mb-7 space-y-3">
-              <div className="flex items-center gap-2 rounded-lg bg-positive-bg px-4 py-3 text-[14px] font-semibold text-positive">
-                <CheckCircle2 className="size-4" /> The {data.invoice ? `$${data.invoice.amount / 1000}K` : ''} invoice is covered and scheduled.
-              </div>
-              <Receipt data={data} />
+            <div className="mb-5 flex flex-wrap items-center gap-3 rounded-lg bg-positive-bg px-4 py-3 text-[14px] font-semibold text-positive">
+              <CheckCircle2 className="size-4" /> Covered. Checking now stays above zero on {shortDay(data.invoice!.due)}.
+              <Btn variant="link" className="ml-auto text-positive" onClick={actions.proof}>View receipt</Btn>
             </div>
           )}
 
-          {/* Coming up */}
-          <Card
-            title={<span id="coming-up">Coming up</span>}
-            action={<span className="text-[12px] text-muted-foreground">Projected checking vs. everything due through {longDay(data.forecast.end)}</span>}
-            className="mb-7"
-          >
-            <div className="px-5 pt-4 pb-3">
-              <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-                <span className="text-[12px] text-muted-foreground">Checking ••{data.accounts.checking.last4} today</span>
-                <span className="tabular text-[22px] font-medium">{formatUSD(data.forecast.opening)}</span>
-                {data.forecast.shortfall > 0 ? (
-                  <span className="flex items-center gap-1.5 rounded-md bg-negative-bg px-2 py-1 text-[12px] font-semibold text-negative">
-                    <AlertTriangle className="size-3.5" /> {formatUSD(data.forecast.shortfall)} short on {longDay(data.forecast.low.date)}
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5 rounded-md bg-positive-bg px-2 py-1 text-[12px] font-semibold text-positive">
-                    <CheckCircle2 className="size-3.5" /> Covered: lowest balance {formatUSD(data.forecast.low.balance)}
-                  </span>
-                )}
+          <div className="mb-7 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
+            <Card title="Coming up" action={<span className="text-[12px] text-muted-foreground">Projected checking · next 2 weeks</span>}>
+              <div className="px-4 pt-4 pb-2">
+                <CashChart forecast={data.forecast} before={data.forecast_before} dueDate={data.invoice?.due} />
+                <div className="mt-2 px-1"><ChartLegend approved={!!data.approval} /></div>
               </div>
-              <div className="mt-4"><CashChart forecast={data.forecast} /></div>
-            </div>
-            <div className="border-t">
-              <Timeline forecast={data.forecast} highlight={data.forecast.shortfall > 0 ? data.obligations.find(o => o.kind === 'invoice')?.id : undefined} />
-            </div>
-          </Card>
+              <div className="mt-2 border-t"><ComingUp data={data} /></div>
+            </Card>
 
-          {/* Needs you */}
-          <Card title={<span id="needs-you">Needs you</span>} action={<span className="text-[12px] text-muted-foreground">3 cards at most</span>} className="mb-7">
-            <ol className="divide-y">
-              {data.needs_you.cards.map((c, i) => (
-                <li key={c.id} className={cn('flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4', c.urgent && 'bg-negative-bg/30')}>
-                  <span className="w-3 text-[13px] text-muted-foreground">{i + 1}</span>
-                  <div className="min-w-0 flex-1">
-                    {c.urgent && <span className="mb-1 inline-block rounded bg-negative-bg px-1.5 py-px text-[10px] font-semibold text-negative">Urgent</span>}
-                    <p className="text-[14px]"><span className="font-semibold">{c.title}</span>{c.question ? ` ${c.question}` : ''}</p>
-                    <p className="mt-0.5 text-[12px] text-muted-foreground">Why am I seeing this? {c.why}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button disabled={busy !== null} onClick={() => void feedback(c.id, 'not_now')} className="flex h-[30px] items-center gap-1 rounded-md border bg-white px-2.5 text-[12px] font-semibold hover:bg-[#f2f5f4]"><Clock className="size-3.5" /> Not now</button>
-                    <button disabled={busy !== null} onClick={() => void feedback(c.id, 'wrong')} className="flex h-[30px] items-center gap-1 rounded-md border bg-white px-2.5 text-[12px] font-semibold hover:bg-[#f2f5f4]"><ThumbsDown className="size-3.5" /> This is wrong</button>
-                    {c.type !== 'subscription' && (
-                      <Link href={c.href} className="flex h-[30px] items-center gap-1 rounded-md bg-mint px-3 text-[12px] font-semibold text-mint-ink hover:bg-mint-hover">
-                        {c.type === 'money_owed' ? 'Review' : 'See breakdown'} <ArrowRight className="size-3.5" />
-                      </Link>
-                    )}
-                  </div>
-                </li>
-              ))}
-              {!data.needs_you.cards.length && <li className="px-5 py-4 text-[13px]">Nothing needs a decision right now.</li>}
-            </ol>
-            <div className="border-t px-5 py-2.5 text-[12px] text-muted-foreground">+ {data.needs_you.others} other things look fine</div>
-          </Card>
+            <Card
+              title="Needs you"
+              action={<span className="text-[12px] text-muted-foreground">{data.needs_you.cards.length} open · max 3</span>}
+            >
+              <div className="p-4"><NeedsYou data={data} actions={actions} wrongFor={wrongFor} setWrongFor={setWrongFor} /></div>
+            </Card>
+          </div>
 
-          {/* Where it goes */}
-          <Card title="Where it goes" action={<Link href="/business-health/spend" className="text-[12px] font-semibold text-brand hover:underline">See breakdown</Link>}>
-            <Link href="/business-health/spend" className="block px-5 py-4 hover:bg-[#f7f9f8]">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-[13px]"><span className="font-semibold">{data.where_it_goes.provider}</span> <span className="text-muted-foreground">this month</span></span>
-                <span className="tabular text-[18px] font-semibold">{formatUSD(data.where_it_goes.amount)}</span>
-              </div>
-              <div className="mt-3 flex h-2.5 overflow-hidden rounded-full">
-                {data.where_it_goes.purposes.map((p, i) => (
-                  <span key={p.label} className={i === 0 ? 'bg-[#5a4bd1]' : 'bg-[#3ecfa3]'} style={{ width: `${(p.amount / data.where_it_goes.amount) * 100}%` }} />
-                ))}
-              </div>
-              <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-[12px]">
-                {data.where_it_goes.purposes.map((p, i) => (
-                  <span key={p.label} className="flex items-center gap-1.5">
-                    <span className={cn('size-2 rounded-full', i === 0 ? 'bg-[#5a4bd1]' : 'bg-[#3ecfa3]')} /> {p.label} <span className="tabular font-semibold">{formatUSD(p.amount)}</span>
-                  </span>
-                ))}
-              </div>
-            </Link>
-          </Card>
+          <div id="where-it-goes" className="mb-7 scroll-mt-6">
+            <Card title="Where it goes" action={<span className="text-[12px] text-muted-foreground">{data.spend.claude.month}</span>}>
+              <WhereItGoes spend={data.spend} open={breakdown} setOpen={setBreakdown} />
+            </Card>
+          </div>
+
+          <Metrics data={data} />
         </>
       )}
+
+      {data && overlay === 'proof' && data.invoice && (
+        <ProofDrawer
+          data={data}
+          onClose={close}
+          onConfirm={() => setOverlay('confirm')}
+          onWrong={() => { setOverlay(null); if (moneyCard) setWrongFor(moneyCard.id); }}
+        />
+      )}
+      {data && overlay === 'confirm' && data.invoice && <ConfirmModal data={data} onClose={close} onApproved={() => approved(data)} />}
+      {data && overlay === 'dispute' && <DisputeModal data={data} onClose={close} />}
+      {overlay === 'specialist' && <SpecialistModal onClose={close} />}
     </>
+  );
+}
+
+function Kpis({ data }: { data: HealthView }) {
+  const k = data.kpis;
+  const tiles: { label: string; value: string; sub: string; tone?: 'red' | 'teal' | 'up' }[] = [
+    { label: 'Checking today', value: formatUSDShort(k.checking), sub: `+ Treasury ${formatUSDShort(k.treasury)}` },
+    k.lowest
+      ? { label: 'Lowest checking, next 2 weeks', value: formatUSDShort(k.lowest.balance).replace('-', '−'), sub: `on ${shortDay(k.lowest.date)}`, tone: k.lowest.balance < 0 ? 'red' : 'teal' }
+      : { label: 'Lowest checking, next 2 weeks', value: '—', sub: 'Forecast starts Nov 18' },
+    { label: 'Monthly burn, incl. salaries', value: formatUSDShort(k.burn), sub: `↑ ${k.burn_change}% vs. 3-month avg`, tone: 'up' },
+    { label: 'Runway', value: `${k.runway} mo`, sub: `was ${k.runway_was.toFixed(1)} in October` },
+  ];
+  return (
+    <div className="mb-7 grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border lg:grid-cols-4">
+      {tiles.map(t => (
+        <div key={t.label} className="bg-white px-5 py-4">
+          <div className="text-[12px] text-muted-foreground">{t.label}</div>
+          <div className={cn('mt-1 text-[24px] font-medium tracking-tight tabular', t.tone === 'red' && 'text-negative', t.tone === 'teal' && 'text-positive')}>{t.value}</div>
+          <div className={cn('mt-0.5 text-[12px] text-muted-foreground', t.tone === 'up' && 'text-warning')}>{t.sub}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Oct 3: the invoice is in the inbox but nowhere near due, so there's nothing to decide yet. */
+function BeforeTheAlert({ data }: { data: HealthView }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <Card className="mb-7">
+      <div className="flex flex-wrap items-center gap-3 px-5 py-4 text-[13px]">
+        <Clock className="size-4 text-muted-foreground" />
+        <span className="flex-1">
+          Rho found {data.invoice ? <>a {formatUSDShort(data.invoice.amount)} invoice from {data.invoice.vendor}, due {longDay(data.invoice.due)}</> : 'nothing due yet'}.
+          {' '}It’s nowhere near due, so there’s nothing to decide yet.
+        </span>
+        <Btn variant="mint" disabled={busy} onClick={() => { setBusy(true); void healthPost('state', { date: DEMO_DATES.alert }).finally(() => setBusy(false)); }}>
+          Jump to Wed, Nov 18 →
+        </Btn>
+      </div>
+    </Card>
+  );
+}
+
+function Metrics({ data }: { data: HealthView }) {
+  return (
+    <section>
+      <div className="mb-2.5 flex items-center gap-2"><h2 className="text-[14px] font-semibold">Your metrics</h2><Chip>Coming next</Chip></div>
+      <div className="rounded-lg border border-dashed bg-white p-5">
+        <p className="text-[13px] text-muted-foreground">Calculated your way: you pick which sources count as revenue and which costs keep it running.</p>
+        <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {data.metrics_preview.map(m => (
+            <div key={m.label}>
+              <div className="text-[12px] text-muted-foreground">{m.label}</div>
+              <div className="mt-1 text-[20px] font-medium tabular">{m.value}</div>
+              <div className="text-[12px] text-muted-foreground">{m.note}</div>
+            </div>
+          ))}
+        </div>
+        <Btn className="mt-4" disabled>Define revenue sources · next phase</Btn>
+      </div>
+    </section>
   );
 }
