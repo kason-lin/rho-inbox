@@ -16,14 +16,14 @@ const uuid = () => crypto.randomUUID();
 export const COMPANY = 'Loop Labs';
 
 export const USERS: AppUser[] = [
-  { id: 'maya', name: 'Maya Chen', title: 'Founder & CEO', role: 'admin' },
+  { id: 'kason', name: 'Kason Lin', title: 'Founder & CEO', role: 'admin' },
   { id: 'jordan', name: 'Jordan Ellis', title: 'Co-founder & CTO', role: 'admin' },
   { id: 'ana', name: 'Ana Costa', title: 'Operations', role: 'member' },
   { id: 'dana', name: 'Dana Okafor', title: 'Rho account manager', role: 'account_manager' },
 ];
 
 export const TEAM = [
-  { name: 'Maya Chen', card: '4102', typical: 180 },
+  { name: 'Kason Lin', card: '4102', typical: 180 },
   { name: 'Jordan Ellis', card: '3318', typical: 140 },
   { name: 'Ana Costa', card: '5520', typical: 120 },
   { name: 'Priya Shah', card: '7731', typical: 90 },

@@ -23,7 +23,7 @@ async function main() {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
   // 0. Home: Rho's dashboard with this week's Check-in on top
-  await page.goto(`${BASE}/?as=maya`);
+  await page.goto(`${BASE}/?as=kason`);
   await page.getByText('Monday Check-in').first().waitFor();
   await page.getByText('Top outflows').waitFor();
   await page.waitForFunction(() => !document.querySelector('.animate-pulse'));
@@ -70,8 +70,8 @@ async function main() {
   await page.getByText('Hidden for your role').first().waitFor();
   await shot(page, '07-teammate-view');
 
-  // 8. Architecture, 9. Audit log (back as Maya)
-  await page.goto(`${BASE}/architecture?as=maya`);
+  // 8. Architecture, 9. Audit log (back as Kason)
+  await page.goto(`${BASE}/architecture?as=kason`);
   await page.locator('svg[id^="m"]').first().waitFor({ timeout: 15_000 });
   await shot(page, '08-architecture', true);
 

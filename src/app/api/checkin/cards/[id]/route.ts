@@ -6,7 +6,7 @@ import { adminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/checkin/cards/:id?as=maya → one card with its proof, prepared action and current balances.
+// GET /api/checkin/cards/:id?as=kason → one card with its proof, prepared action and current balances.
 export const GET = route(async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
   const viewer = await resolveViewer(new URL(req.url).searchParams.get('as'));
   if ('response' in viewer) return viewer.response;

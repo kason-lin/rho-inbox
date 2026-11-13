@@ -1,13 +1,13 @@
-# 90-second demo: “Maya's Monday”
+# 90-second demo: “Kason's Monday”
 
-**One story:** Maya Chen founded Loop Labs (6 people). It's Monday, 8:00 AM. She has payroll on Friday and no time to check five tabs.
+**One story:** Kason Lin founded Loop Labs (6 people). It's Monday, 8:00 AM. Payroll is due Friday, and there's no time to check five tabs.
 
-**The point to land:** Rho already has the data. Check-in does the prep work, so Maya just says yes or no, and nothing moves without her tap.
+**The point to land:** Rho already has the data. Check-in does the prep work, so Kason just says yes or no, and nothing moves without a tap.
 
 ## Before you start (2 minutes, off stage)
 
 1. `npm run seed` to reset to Monday morning: 3 cards, 14 "looks fine".
-2. Make sure the dev server is running, then open **`http://localhost:3100/mail?as=maya`** in a full-width window.
+2. Make sure the dev server is running, then open **`http://localhost:3100/mail?as=kason`** in a full-width window.
 3. Open **`/architecture`** in a second tab and leave it for the end.
 4. Close other tabs, turn on Do Not Disturb, and zoom the browser to 110% if the room is big.
 
@@ -35,7 +35,7 @@ Optional: add `ANTHROPIC_API_KEY` to `.env.local` so the summary badge says “W
 - **The duplicate charge doesn't appear within about 3 seconds:** refresh the Inbox. The event is already saved; only the live push was slow. Say: “In production this arrives as a push notification.”
 - **“No recent subscription charge left to duplicate”:** you've already simulated several. Use **Simulate event → Unusual card charge** instead, or reset with `npm run seed`.
 - **The first card already says approved:** the data wasn't reset. Run `npm run seed` and reload.
-- **You're stuck as Ana:** open any page with `?as=maya`.
+- **You're stuck as Ana:** open any page with `?as=kason`.
 
 ## Likely questions
 

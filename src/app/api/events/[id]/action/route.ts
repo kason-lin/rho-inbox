@@ -2,11 +2,12 @@ import { z } from 'zod';
 import { canTakeAction, followUpFor } from '@/lib/actions';
 import { error, json, parseBody, route } from '@/lib/api';
 import { decideCard, getUser } from '@/lib/checkin/store';
+import { viewerId } from '@/lib/checkin/viewer-id';
 import { getEvent, insertEvent, updateStatus } from '@/lib/inbox';
 import { adminClient } from '@/lib/supabase/admin';
 import { ACTIONS } from '@/lib/types';
 
-const Body = z.object({ action: z.enum(ACTIONS), as: z.string().default('maya') });
+const Body = z.object({ action: z.enum(ACTIONS), as: z.string().default('kason') });
 
 // POST /api/events/:id/action  { action: 'approve'|'pay'|'dispute', as?: user id }
 // Marks the event done and appends the product's confirmation to the same thread.
@@ -23,10 +24,10 @@ export const POST = route(async (req: Request, { params }: { params: Promise<{ i
   if (!check.ok) return error(check.error, 409);
 
   const db = adminClient();
-  const user = await getUser(db, body.data.as ?? 'maya');
+  const user = await getUser(db, viewerId(body.data.as));
   if (!user) return error('Unknown user', 404);
   // Same guardrail as Check-in: money actions need an admin.
-  if (user.role !== 'admin') return error(`${user.name} can't ${body.data.action} this. An admin (Maya Chen or Jordan Ellis) has to.`, 403);
+  if (user.role !== 'admin') return error(`${user.name} can't ${body.data.action} this. An admin (Kason Lin or Jordan Ellis) has to.`, 403);
 
   const cardId = event.meta.checkin_card_id;
   if (typeof cardId === 'string' && event.type.startsWith('checkin_')) {

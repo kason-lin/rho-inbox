@@ -98,7 +98,7 @@ export default function CardPage({ params }: { params: Promise<{ id: string }> }
                       {busy === 'approve' ? 'Working…' : card.action?.kind === 'share' ? 'Share' : 'Approve'}
                     </Button>
                     <Button variant="outline" className="h-10 w-full" onClick={() => setStep('proof')} disabled={!!busy}>Cancel</Button>
-                    {!card.can_approve && <p className="text-xs text-muted-foreground">Only an admin can approve. {viewer.role === 'account_manager' ? '' : 'Maya or Jordan will get this card too.'}</p>}
+                    {!card.can_approve && <p className="text-xs text-muted-foreground">Only an admin can approve. {viewer.role === 'account_manager' ? '' : 'Kason or Jordan will get this card too.'}</p>}
                   </>
                 ) : (
                   <>

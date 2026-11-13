@@ -74,7 +74,7 @@ export function planDecision(card: CheckinCard, decision: Decision, user: AppUse
 
   // approve
   if (!canApprove(user)) {
-    return { ok: false, status: 403, error: `${user.name} can't approve this. An admin (Maya Chen or Jordan Ellis) has to.` };
+    return { ok: false, status: 403, error: `${user.name} can't approve this. An admin (Kason Lin or Jordan Ellis) has to.` };
   }
   const action = card.action;
   if (!action) return { ok: false, status: 422, error: 'This card has no action to approve.' };

@@ -18,7 +18,7 @@ const OTHER_MAIL = [
 ];
 
 export default function MailPage() {
-  const { data } = useLive<CheckinView>('/api/checkin?as=maya', ['checkin_cards']);
+  const { data } = useLive<CheckinView>('/api/checkin?as=kason', ['checkin_cards']);
   const count = data?.cards.length ?? 3;
   const subject = `${count} ${count === 1 ? 'thing needs' : 'things need'} you this week`;
 
@@ -64,7 +64,7 @@ export default function MailPage() {
             <div className="mt-3 flex items-center gap-3 text-[13px]">
               <span className="grid size-9 place-items-center rounded-full bg-foreground font-wordmark text-lg text-white">R</span>
               <div>
-                <div><span className="font-semibold">Rho Check-in</span> <span className="text-muted-foreground">· to Maya Chen</span></div>
+                <div><span className="font-semibold">Rho Check-in</span> <span className="text-muted-foreground">· to Kason Lin</span></div>
                 <div className="text-xs text-muted-foreground">Monday, 8:00 AM · Loop Labs</div>
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function MailPage() {
               <div className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">Monday 8:00 AM · Weekly check-in</div>
               <h2 className="mt-2 font-display text-2xl font-semibold">{subject.replace(' this week', '')}</h2>
               <p className="mt-1 text-[13px] text-muted-foreground">Rho did the prep work. Each one takes a tap, and no money moves without you.</p>
-              <div className="mt-4"><DigestCard as="maya" compact /></div>
+              <div className="mt-4"><DigestCard as="kason" compact /></div>
 
               <ol className="mt-5 space-y-3">
                 {(data?.cards ?? []).map((c, i) => (

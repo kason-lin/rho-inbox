@@ -63,7 +63,7 @@ Ranking (in `src/lib/checkin/engine.ts`):
 - **Visible confidence.** Every card shows when its data was last updated.
 - **Audit trail.** Every suggestion and decision is logged, including taps the guardrails refused.
 
-Switch roles from the avatar menu, or with a link: `?as=maya` (founder, admin), `?as=ana` (teammate), `?as=dana` (Rho account manager).
+Switch roles from the avatar menu, or with a link: `?as=kason` (founder, admin), `?as=ana` (teammate), `?as=dana` (Rho account manager).
 
 ## Architecture
 

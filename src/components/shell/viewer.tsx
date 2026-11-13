@@ -1,8 +1,9 @@
 'use client';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { AppUser } from '@/lib/checkin/types';
+import { viewerId } from '@/lib/checkin/viewer-id';
 
-const FALLBACK: AppUser = { id: 'maya', name: 'Maya Chen', title: 'Founder & CEO', role: 'admin' };
+const FALLBACK: AppUser = { id: 'kason', name: 'Kason Lin', title: 'Founder & CEO', role: 'admin' };
 const KEY = 'rho-inbox:viewer';
 
 type ViewerState = { viewer: AppUser; users: AppUser[]; setViewer: (id: string) => void };
@@ -10,11 +11,11 @@ const ViewerContext = createContext<ViewerState>({ viewer: FALLBACK, users: [FAL
 
 /**
  * Who the demo is "logged in" as. There's no real auth in the prototype; the role switcher in the
- * top bar picks Maya (founder, admin), Ana (teammate, payroll hidden) or Dana (Rho account manager).
+ * top bar picks Kason (founder, admin), Ana (teammate, payroll hidden) or Dana (Rho account manager).
  */
 export function ViewerProvider({ children }: { children: React.ReactNode }) {
   const [users, setUsers] = useState<AppUser[]>([FALLBACK]);
-  const [id, setId] = useState('maya');
+  const [id, setId] = useState('kason');
 
   useEffect(() => {
     // ?as=ana in the URL switches the viewer (handy for links in the demo script and for screenshots).
@@ -22,9 +23,9 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
     try {
       if (fromUrl) localStorage.setItem(KEY, fromUrl);
       const saved = fromUrl ?? localStorage.getItem(KEY);
-      if (saved) setId(saved);
+      if (saved) setId(viewerId(saved));
     } catch {
-      if (fromUrl) setId(fromUrl);   // storage can be blocked; the URL still works for this page
+      if (fromUrl) setId(viewerId(fromUrl));   // storage can be blocked; the URL still works for this page
     }
     fetch('/api/users')
       .then(r => r.json())

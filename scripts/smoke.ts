@@ -29,17 +29,17 @@ async function call(method: string, path: string, body?: unknown) {
 }
 
 const threads = async (query = '') => (await call('GET', `/api/events${query}`)).body.threads as InboxThread[];
-const checkin = async (as = 'maya') => (await call('GET', `/api/checkin?as=${as}`)).body as { cards: CardView[]; others: string[]; accounts: { id: string; balance: number }[] };
-const decide = (id: string, decision: string, as = 'maya') => call('POST', `/api/checkin/cards/${id}/decision`, { decision, as });
+const checkin = async (as = 'kason') => (await call('GET', `/api/checkin?as=${as}`)).body as { cards: CardView[]; others: string[]; accounts: { id: string; balance: number }[] };
+const decide = (id: string, decision: string, as = 'kason') => call('POST', `/api/checkin/cards/${id}/decision`, { decision, as });
 
 async function main() {
   // ---------- Concurrency: many open pages loading at once must not duplicate cards ----------
   await call('POST', '/api/checkin/run');
-  const burst = await Promise.all(['maya', 'ana', 'dana', 'maya', 'jordan'].map(as => checkin(as)));
+  const burst = await Promise.all(['kason', 'ana', 'dana', 'kason', 'jordan'].map(as => checkin(as)));
   check('5 simultaneous loads still give exactly 3 cards', burst.every(b => b.cards.length === 3) && (await checkin()).cards.length === 3);
 
   // ---------- AI digest (template when no ANTHROPIC_API_KEY) ----------
-  const digest = (await call('GET', '/api/digest?as=maya')).body as { text: string; source: string };
+  const digest = (await call('GET', '/api/digest?as=kason')).body as { text: string; source: string };
   const sentences = digest.text.split(/(?<=[.!?”])\s+(?=[A-Z0-9])/).length;
   check('digest is three sentences', sentences === 3, `${digest.source}: ${digest.text.slice(0, 70)}…`);
 
@@ -72,7 +72,7 @@ async function main() {
   check('account manager cannot decide', (await decide(payday.id, 'not_now', 'dana')).status === 403);
 
   // ---------- Approve the transfer (screens 2–4) ----------
-  const card = await call('GET', `/api/checkin/cards/${payday.id}?as=maya`);
+  const card = await call('GET', `/api/checkin/cards/${payday.id}?as=kason`);
   check('proof screen: payments and balances', card.status === 200 && card.body.card.proof.length === 3);
   const approved = await decide(payday.id, 'approve');
   const checking = approved.body.accounts?.find((a: { id: string }) => a.id === 'checking');
@@ -123,7 +123,7 @@ async function main() {
   check('urgent card jumps to the top of Check-in', withDup.cards[0]?.type === 'suspicious_charge', withDup.cards.map(c => c.title).join(' | '));
   const sim = simulated as { card: CardView | null; event: { id: string } | null } | null;
   if (sim?.event) {
-    const disputed = await call('POST', `/api/events/${sim.event.id}/action`, { action: 'dispute', as: 'maya' });
+    const disputed = await call('POST', `/api/events/${sim.event.id}/action`, { action: 'dispute', as: 'kason' });
     check('dispute from the Inbox row', disputed.status === 200 && disputed.body.done?.headline === 'Dispute submitted.');
   }
 

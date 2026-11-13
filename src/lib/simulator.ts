@@ -19,7 +19,7 @@ const cents = (rng: Rng, min: number, max: number) => Math.round((min + rng() * 
 const daysFrom = (now: Date, days: number) => new Date(now.getTime() + days * 86_400_000).toISOString();
 
 export const CARDHOLDERS = [
-  { name: 'Maya Chen', typical: 180 },
+  { name: 'Kason Lin', typical: 180 },
   { name: 'Jordan Ellis', typical: 140 },
   { name: 'Ana Costa', typical: 120 },
   { name: 'Priya Shah', typical: 90 },

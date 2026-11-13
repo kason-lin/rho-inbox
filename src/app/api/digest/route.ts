@@ -8,7 +8,7 @@ import { buildThreads, summarize } from '@/lib/threads';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/digest?as=maya → { text, source: 'claude' | 'template', generated_at, note? }
+// GET /api/digest?as=kason → { text, source: 'claude' | 'template', generated_at, note? }
 // Three sentences summarizing the week, written from the viewer's role-filtered Check-in.
 export const GET = route(async (req: Request) => {
   const viewer = await resolveViewer(new URL(req.url).searchParams.get('as'));

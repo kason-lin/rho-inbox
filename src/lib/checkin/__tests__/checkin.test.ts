@@ -101,7 +101,7 @@ describe('guardrails', () => {
     const card = asCard(s);
     expect(planDecision(card, 'approve', user('ana'), s.accounts, NOW)).toMatchObject({ ok: false, status: 403 });
     expect(planDecision(card, 'not_now', user('dana'), s.accounts, NOW)).toMatchObject({ ok: false, status: 403 });
-    const ok = planDecision(card, 'approve', user('maya'), s.accounts, NOW);
+    const ok = planDecision(card, 'approve', user('kason'), s.accounts, NOW);
     expect(ok.ok && ok.plan.done.headline).toBe('Payroll is covered.');
     expect(ok.ok && ok.plan.balances).toEqual([{ id: 'treasury', balance: 1_027_200 }, { id: 'checking', balance: 16_800 }]);
     expect(ok.ok && ok.plan.audit.map(a => a.event)).toEqual(['decision_approved', 'transfer_executed']);
@@ -111,8 +111,8 @@ describe('guardrails', () => {
     const s = fresh();
     const card = asCard(s);
     const outside = { ...card, action: { ...card.action!, to: 'someone_else' } } as unknown as CheckinCard;
-    expect(planDecision(outside, 'approve', user('maya'), s.accounts, NOW)).toMatchObject({ ok: false, status: 422 });
-    expect(planDecision({ ...card, status: 'approved' }, 'approve', user('maya'), s.accounts, NOW)).toMatchObject({ ok: false, status: 409 });
+    expect(planDecision(outside, 'approve', user('kason'), s.accounts, NOW)).toMatchObject({ ok: false, status: 422 });
+    expect(planDecision({ ...card, status: 'approved' }, 'approve', user('kason'), s.accounts, NOW)).toMatchObject({ ok: false, status: 409 });
   });
 
   it('hides payroll details from non-admins', () => {
@@ -122,7 +122,7 @@ describe('guardrails', () => {
     expect(asAna.redacted).toBe(true);
     expect(JSON.stringify(asAna.proof)).not.toContain('Priya Shah');
     expect(asAna.proof.flatMap(p => p.items).filter(i => i.payroll).every(i => i.amount === null)).toBe(true);
-    expect(viewCard(burn, user('maya')).redacted).toBe(false);
+    expect(viewCard(burn, user('kason')).redacted).toBe(false);
     expect(viewCard(burn, user('dana')).proof).toEqual(burn.proof);   // the rep sees the same card
   });
 
