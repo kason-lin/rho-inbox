@@ -30,7 +30,7 @@ export function PresenterBar({ className }: { className?: string }) {
     setBusy(true);
     try {
       await healthPost('state', { date: to });
-      if (to === DEMO_DATES.alert) router.push('/alert');   // the alert is what happens on Nov 18
+      if (to === DEMO_DATES.alert) router.push('/mailbox?new=1');   // on Nov 18 Rho's alert lands in the inbox
     } finally {
       setBusy(false);
     }

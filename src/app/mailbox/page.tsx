@@ -2,12 +2,14 @@
 /**
  * Story beat 1: a Gmail-style inbox (generic mail client, not Google's). Northbeam Studio's $55,000
  * invoice arrived Oct 3 on net-60 terms. Nobody has entered it anywhere; Rho's read-only inbox
- * connection is the only thing that noticed.
+ * connection is the only thing that noticed. On Nov 18 Rho's alert email arrives in the same inbox,
+ * with a new-mail notification.
  */
-import { ArrowLeft, FileText, Inbox, Paperclip, Pencil, Search, Send, Sparkles, Star } from 'lucide-react';
+import { ArrowLeft, FileText, Forward, Inbox, Paperclip, Pencil, Reply, Search, Send, Sparkles, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import { AlertEmailBody } from '@/components/health/alert-email';
 import { PresenterBar } from '@/components/health/presenter-bar';
 import { Btn } from '@/components/health/ui';
 import { healthPost, useHealth } from '@/components/health/use-health';
@@ -15,9 +17,12 @@ import { DEMO_DATES } from '@/lib/health/data';
 import type { Email } from '@/lib/health/data';
 import { shortDay } from '@/lib/health/dates';
 import type { Invoice } from '@/lib/health/extract';
+import type { HealthView } from '@/lib/health/view';
 import { cn } from 'cn';
 
 type InboxData = { date: string; connected: boolean; emails: Email[]; invoices: Invoice[] };
+
+const ALERT_ID = 'rho-alert';   // Rho's own alert email, built from the live forecast (not in inbox.json)
 
 export default function MailboxPage() {
   return (
@@ -39,11 +44,18 @@ function Mailbox() {
 
   const open = data?.emails.find(e => e.id === openId) ?? null;
   const invoiceFor = (id: string) => data?.invoices.find(i => i.id === id);
+  const alert = health?.alert ?? null;
+  const alertOpen = openId === ALERT_ID && !!alert;
+  const [alertRead, setAlertRead] = useState(false);
+  useEffect(() => { if (alertOpen) setAlertRead(true); }, [alertOpen]);
+  const total = (data?.emails.length ?? 0) + (alert ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-[#f6f8fc] p-3 text-[#1f1f1f]">
       <PresenterBar className="mb-3" />
       {health && health.date < DEMO_DATES.alert && data?.invoices[0] && <Narration amount={data.invoices[0].amount} />}
+      {health && alert && !alertOpen && <AlertNarration />}
+      {health && alert && params.get('new') && !alertOpen && <NewMailNotification subject={alert.text} />}
       <div className="flex gap-3">
         {/* left rail */}
         <aside className="hidden w-56 shrink-0 md:block">
@@ -53,7 +65,7 @@ function Mailbox() {
           <button className="mb-4 flex items-center gap-3 rounded-2xl bg-[#c2e7ff] px-5 py-4 text-[14px] font-medium text-[#001d35]">
             <Pencil className="size-4" /> Compose
           </button>
-          {[[Inbox, 'Inbox', data?.emails.length ?? 0], [Star, 'Starred', 0], [Send, 'Sent', 0], [FileText, 'Drafts', 0]].map(([Icon, label, n]) => {
+          {[[Inbox, 'Inbox', total], [Star, 'Starred', 0], [Send, 'Sent', 0], [FileText, 'Drafts', 0]].map(([Icon, label, n]) => {
             const I = Icon as React.ElementType;
             return (
               <div key={label as string} className={cn('flex items-center gap-4 rounded-r-full px-6 py-1.5 text-[14px]', label === 'Inbox' && 'bg-[#d3e3fd] font-semibold')}>
@@ -74,8 +86,20 @@ function Mailbox() {
 
           {!data && <p className="p-6 text-[14px] text-[#444746]">Loading…</p>}
 
-          {data && !open && (
+          {data && !open && !alertOpen && (
             <ul>
+              {alert && (
+                <li>
+                  <Link href={`/mailbox?email=${ALERT_ID}`} className={cn('flex items-center gap-4 border-b border-[#f1f3f4] px-4 py-2.5 text-[14px] hover:shadow-[inset_1px_0_0_#dadce0,inset_-1px_0_0_#dadce0,0_1px_2px_0_rgba(60,64,67,.3)]', alertRead ? 'bg-[#f2f6fc]' : 'animate-arrive bg-white font-semibold')}>
+                    <Star className="size-4 shrink-0 text-[#c4c7c5]" />
+                    <span className="flex w-56 shrink-0 items-center gap-2 truncate">Rho {!alertRead && <span className="rounded bg-[#0f0f10] px-1.5 py-px font-mono text-[10px] font-normal tracking-[0.06em] text-[#6af3d9] uppercase">New</span>}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {alert.text.split('.')[0]} <span className="font-normal text-[#5f6368]">– {alert.text.split('. ')[1]} Review the fix in Rho.</span>
+                    </span>
+                    <span className="w-16 shrink-0 text-right text-[12px]">8:00 AM</span>
+                  </Link>
+                </li>
+              )}
               {data.emails.map(e => {
                 const inv = invoiceFor(e.id);
                 const unread = !!inv;
@@ -95,6 +119,8 @@ function Mailbox() {
               })}
             </ul>
           )}
+
+          {alertOpen && health && <AlertEmail health={health} />}
 
           {data && open && (
             <article className="px-6 py-5">
@@ -132,7 +158,7 @@ function Narration({ amount }: { amount: number }) {
   const [busy, setBusy] = useState(false);
   async function jump() {
     setBusy(true);
-    try { await healthPost('state', { date: DEMO_DATES.alert }); router.push('/alert'); } catch { setBusy(false); }
+    try { await healthPost('state', { date: DEMO_DATES.alert }); router.push('/mailbox?new=1'); } catch { setBusy(false); }
   }
   return (
     <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3">
@@ -143,6 +169,73 @@ function Narration({ amount }: { amount: number }) {
       </div>
       <Btn variant="mint" disabled={busy} onClick={() => void jump()}>Jump to Wed, Nov 18 →</Btn>
     </div>
+  );
+}
+
+/** Presenter caption for Nov 18: the alert has arrived. */
+function AlertNarration() {
+  return (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3">
+      <div>
+        <div className="font-mono text-[11px] tracking-[0.08em] text-[#048d73] uppercase">Wed, Nov 18 · 8:00 AM · 14 days before the due date</div>
+        <p className="text-[15px] font-semibold">Six weeks later, Rho sends one alert. Not a digest: one alert, because a decision is due.</p>
+        <p className="text-[13px] text-[#5f6368]">The founder picks email or text.</p>
+      </div>
+      <div className="flex gap-2">
+        <Link href="/alert"><Btn>See it as a text</Btn></Link>
+        <Link href={`/mailbox?email=${ALERT_ID}`}><Btn variant="mint">Open the alert →</Btn></Link>
+      </div>
+    </div>
+  );
+}
+
+/** A desktop-style "new mail" notification that slides in after the date jump. */
+function NewMailNotification({ subject }: { subject: string }) {
+  const [shown, setShown] = useState(false);
+  const [gone, setGone] = useState(false);
+  useEffect(() => {
+    const a = setTimeout(() => setShown(true), 400);
+    const b = setTimeout(() => setGone(true), 12000);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, []);
+  if (gone) return null;
+  return (
+    <div className={cn('fixed top-[150px] right-5 z-50 w-[360px] transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]', shown ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0')}>
+      <div className="flex gap-3 rounded-2xl border border-[#dfe7e8] bg-white/95 p-3.5 shadow-[0_12px_32px_rgba(15,15,16,0.18)] backdrop-blur">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#0f0f10] font-wordmark text-[18px] text-[#f5f8f8]">R</span>
+        <Link href={`/mailbox?email=${ALERT_ID}`} className="min-w-0 flex-1 text-[13px] leading-snug">
+          <span className="flex justify-between text-[12px] text-[#5f6368]"><span className="font-semibold text-[#1f1f1f]">Rho · alerts@rho.co</span> now</span>
+          <span className="mt-0.5 block font-semibold">{subject.split('.')[0]}</span>
+          <span className="block text-[#444746]">{subject.split('. ')[1]}</span>
+        </Link>
+        <button type="button" aria-label="Dismiss" onClick={() => setGone(true)} className="self-start rounded p-0.5 text-[#5f6368] hover:bg-[#f1f3f4]"><X className="size-4" /></button>
+      </div>
+    </div>
+  );
+}
+
+/** Rho's alert, opened in the mail client. */
+function AlertEmail({ health }: { health: HealthView }) {
+  const alert = health.alert!;
+  return (
+    <article className="px-6 py-5">
+      <Link href="/mailbox" className="mb-4 inline-flex items-center gap-1 text-[13px] text-[#444746] hover:underline"><ArrowLeft className="size-4" /> Back to inbox</Link>
+      <h1 className="flex flex-wrap items-center gap-2 text-[22px]">{alert.text.split('.')[0]} <span className="rounded bg-[#e8eaed] px-1.5 py-0.5 text-[11px] text-[#444746]">Inbox</span></h1>
+      <div className="mt-4 flex items-center gap-3 text-[14px]">
+        <span className="grid size-10 place-items-center rounded-full bg-[#0f0f10] font-wordmark text-[18px] text-[#f5f8f8]">R</span>
+        <div className="flex-1">
+          <div><span className="font-semibold">Rho</span> <span className="text-[12px] text-[#5f6368]">&lt;alerts@rho.co&gt;</span></div>
+          <div className="text-[12px] text-[#5f6368]">to me · {shortDay(health.date)}, 8:00 AM</div>
+        </div>
+      </div>
+      <div className="mt-5 rounded-lg bg-[#f4f6f6] px-4 py-6 sm:ml-[52px]">
+        <AlertEmailBody data={health} />
+      </div>
+      <div className="mt-5 flex gap-2 sm:pl-[52px]">
+        <span className="flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] text-[#444746]"><Reply className="size-4" /> Reply</span>
+        <span className="flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] text-[#444746]"><Forward className="size-4" /> Forward</span>
+      </div>
+    </article>
   );
 }
 

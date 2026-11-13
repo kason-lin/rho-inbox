@@ -35,7 +35,10 @@ async function main() {
 
   // 2. Jump to Nov 18 → the alert (email, then text)
   await page.getByRole('button', { name: 'Jump to Wed, Nov 18 →' }).click();
-  await page.waitForURL('**/alert');
+  await page.waitForURL('**/mailbox?new=1');
+  await page.getByText('Rho · alerts@rho.co').waitFor();
+  await shot(page, '01b-alert-arrives');
+  await page.goto(`${BASE}/alert`);
   await page.getByText('Why now').waitFor();
   await shot(page, '03-alert-text');
   await page.getByRole('button', { name: 'Email', exact: true }).click();
