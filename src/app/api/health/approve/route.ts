@@ -30,7 +30,8 @@ export const POST = route(async (req: Request) => {
     approval: {
       transfer_amount: body.data.transfer_amount,
       pay_date: body.data.pay_date,
-      approved_at: new Date().toISOString(),
+      // Stamp the approval on the demo calendar (Nov 18), at the real time of day.
+      approved_at: new Date(`${state.date}T${new Date().toTimeString().slice(0, 8)}`).toISOString(),
       approved_by: user.name,
       reference: `BH-${Date.now().toString(36).toUpperCase().slice(-6)}`,
     },
