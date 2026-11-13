@@ -9,7 +9,6 @@ import { randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { followUpFor } from '../src/lib/actions';
 import { buildLoopLabs } from '../src/lib/checkin/demo-data';
-import { runCheckin } from '../src/lib/checkin/store';
 import { formatUSD } from '../src/lib/format';
 import { classify } from '../src/lib/priority';
 import { advanceInvoice } from '../src/lib/simulator';
@@ -148,11 +147,8 @@ async function main() {
   await put('known_changes', data.changes);
   await put('inbox_events', rows);
 
-  const briefing = await runCheckin(db, now);
   console.log(`Seeded Loop Labs: ${rows.length} inbox events, ${data.transactions.length} transactions.`);
-  console.log(`Check-in: ${briefing.cards.length} things need you`);
-  briefing.cards.forEach(c => console.log(`  ${c.rank}. ${c.title}${c.question ? ` ${c.question}` : ''}`));
-  console.log(`  + ${briefing.others.length} other things look fine`);
+  console.log('Business health reads its own sample data from src/data/business-health/*.json (nothing to seed).');
 }
 
 main().catch(e => {

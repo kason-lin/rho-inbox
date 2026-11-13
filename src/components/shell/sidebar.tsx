@@ -1,6 +1,6 @@
 'use client';
 import {
-  Banknote, BookOpen, Blocks, CalendarCheck, ChartLine, ChevronDown, CreditCard, FileText, Gift, HandCoins,
+  Banknote, BookOpen, Blocks, HeartPulse, ChartLine, ChevronDown, CreditCard, FileText, Gift, HandCoins,
   House, Inbox, Landmark, Network, PanelLeft, Receipt, ScrollText, Settings, Store, Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -53,13 +53,13 @@ export function Sidebar() {
   // Rho's own navigation, with the prototype's features (Inbox, Check-in, Audit log, Architecture) added in.
   const main: Item[] = [
     { label: 'Home', href: '/', icon: House },
+    { label: 'Business health', href: '/business-health', icon: HeartPulse, badge: <NewBadge /> },
     {
       label: 'Inbox', href: '/inbox', icon: Inbox,
       badge: unread > 0 && (
         <span className="tabular min-w-5 rounded-full bg-foreground px-1.5 text-center text-[10px] leading-4 font-semibold text-white">{unread}</span>
       ),
     },
-    { label: 'Check-in', href: '/checkin', icon: CalendarCheck, badge: <NewBadge /> },
     { label: 'Banking', href: '/soon/banking', icon: Landmark, menu: true },
     { label: 'Cards', href: '/soon/cards', icon: CreditCard, menu: true },
     { label: 'Vendors', href: '/soon/vendors', icon: Store },

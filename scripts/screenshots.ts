@@ -1,83 +1,76 @@
 /**
- * Walks the demo story in a headless Chrome and saves README screenshots to docs/screenshots/.
- * Uses your installed Google Chrome with a throwaway profile (your own profile isn't touched).
- * It changes demo data, so it seeds first and you should seed again afterwards:
+ * Walks the Business health story in a headless Chrome and saves README screenshots to docs/screenshots/.
+ * Uses your installed Google Chrome with a throwaway profile (a fresh demo cookie, so it starts on Oct 3).
  *
- *   npm run seed && npm run screenshots && npm run seed
+ *   npm run screenshots
  */
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { chromium, type Page } from 'playwright-core';
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3100';
 const OUT = 'docs/screenshots';
 
 async function shot(page: Page, name: string, fullPage = false) {
-  await page.waitForTimeout(600);   // let fade-ins finish
+  await page.waitForTimeout(700);   // let fades and fetches settle
   await page.screenshot({ path: `${OUT}/${name}.png`, fullPage });
   console.log(`✓ ${OUT}/${name}.png`);
 }
 
 async function main() {
   mkdirSync(OUT, { recursive: true });
+  for (const f of readdirSync(OUT)) rmSync(`${OUT}/${f}`);   // old screenshots from earlier versions
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
-  // 0. Home: Rho's dashboard with this week's Check-in on top
+  // Home: Rho's dashboard, with Business health on top
   await page.goto(`${BASE}/?as=kason`);
-  await page.getByText('Monday Check-in').first().waitFor();
   await page.getByText('Top outflows').waitFor();
-  await page.waitForFunction(() => !document.querySelector('.animate-pulse'));
   await shot(page, '00-home');
 
-  // 1. The Monday email
-  await page.goto(`${BASE}/mail`);
-  await page.getByText('Review the $5,000 transfer').waitFor();
-  await page.getByText('Your week in three sentences').waitFor();
-  await page.waitForFunction(() => !document.querySelector('.animate-pulse'));
-  await shot(page, '01-email');
+  // Connect tools (read-only)
+  await page.goto(`${BASE}/business-health/connect`);
+  await page.getByRole('button', { name: 'Connect all (read-only)' }).click();
+  await page.getByText('Connected (read-only)').first().waitFor();
+  await shot(page, '01-connect');
 
-  // 2. The proof behind the payroll card
-  await page.getByText('Review the $5,000 transfer').click();
-  await page.getByRole('button', { name: /Move \$5,000 to checking/ }).waitFor();
-  await shot(page, '02-proof');
+  // 1. The invoice email (Oct 3)
+  await page.goto(`${BASE}/mailbox?email=em-northbeam-invoice`);
+  await page.getByText('Rho found an invoice').waitFor();
+  await shot(page, '02-inbox');
 
-  // 3. Confirm
-  await page.getByRole('button', { name: /Move \$5,000 to checking/ }).click();
-  await page.getByRole('button', { name: 'Approve' }).waitFor();
-  await shot(page, '03-confirm');
+  // 2. Jump to Nov 18 → the alert
+  await page.getByRole('button', { name: 'Nov 18' }).click();
+  await page.waitForURL('**/alert');
+  await page.getByText('Checking will be $19,800 short.').first().waitFor();
+  await shot(page, '03-alert');
 
-  // 4. Done
-  await page.getByRole('button', { name: 'Approve' }).click();
-  await page.getByText('Payroll is covered.').waitFor();
-  await shot(page, '04-done');
+  // 3. Review → Business health tab
+  await page.getByRole('link', { name: 'Review', exact: true }).click();
+  await page.getByText('Coming up').first().waitFor();
+  await page.getByText('Needs you').first().waitFor();
+  await shot(page, '04-business-health', true);
 
-  // 5. Why am I seeing this? (next card)
-  await page.getByText('Review it').click();
-  await page.getByRole('button', { name: 'Why am I seeing this?' }).click();
-  await page.getByText('Rule that fired').waitFor();
-  await shot(page, '05-why');
+  // Proof → approval sheet
+  await page.goto(`${BASE}/business-health/proof`);
+  await page.getByRole('button', { name: /Review the fix/ }).click();
+  await page.getByText('Gap closed.').waitFor();
+  await shot(page, '05-approval-sheet');
 
-  // 6. Inbox, with a duplicate charge arriving live
-  await page.goto(`${BASE}/inbox`);
-  await page.getByText('Needs action').waitFor();
-  await page.evaluate(() => fetch('/api/simulate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ scenario: 'duplicate_charge' }) }));
-  await page.getByText(/charged \$[\d,.]+ twice in/).waitFor({ timeout: 15_000 });
-  await shot(page, '06-inbox');
+  // 4. Approve → done + receipt
+  await page.getByRole('button', { name: 'Approve', exact: true }).click();
+  await page.getByText('covered and scheduled').first().waitFor();
+  await shot(page, '06-done');
 
-  // 7. A teammate's view of the burn card: payroll hidden, can't approve
-  await page.goto(`${BASE}/checkin?as=ana`);
-  await page.getByText(/^Burn up/).first().click();
-  await page.getByText('Hidden for your role').first().waitFor();
-  await shot(page, '07-teammate-view');
+  // 5. Where it goes: tap the building slice
+  await page.goto(`${BASE}/business-health/spend`);
+  await page.getByText('Building the product').first().click();
+  await page.getByText('Tag as R&D').waitFor();
+  await shot(page, '07-spend-by-purpose');
 
-  // 8. Architecture, 9. Audit log (back as Kason)
-  await page.goto(`${BASE}/architecture?as=kason`);
+  // Architecture
+  await page.goto(`${BASE}/architecture`);
   await page.locator('svg[id^="m"]').first().waitFor({ timeout: 15_000 });
   await shot(page, '08-architecture', true);
-
-  await page.goto(`${BASE}/audit`);
-  await page.getByText('Transfer executed').first().waitFor();
-  await shot(page, '09-audit');
 
   await browser.close();
 }

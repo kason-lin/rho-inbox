@@ -116,7 +116,7 @@ export function buildLoopLabs(now: Date): LoopLabsData {
     transactions.push({ id: uuid(), vendor, amount, category, method: 'card', card_last4: person.card, card_owner: person.name, recurring: false, occurred_at: ago(days, 6) });
   }
   for (const days of [6, 21, 36, 51, 66, 81]) {
-    transactions.push({ id: uuid(), vendor: 'Gusto payroll run', amount: 16_000, category: 'Payroll', method: 'payroll', card_last4: null, card_owner: null, recurring: true, occurred_at: ago(days, 2) });
+    transactions.push({ id: uuid(), vendor: 'Gusto payroll run', amount: 41_200, category: 'Payroll', method: 'payroll', card_last4: null, card_owner: null, recurring: true, occurred_at: ago(days, 2) });
   }
 
   const usage: VendorUsage[] = TOOLS.filter(t => t[4] !== null).map(([vendor, , , , login]) => ({

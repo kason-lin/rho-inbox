@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { loadAccounts } from './checkin/store';
+import company from '@/data/business-health/company.json';
 import type { Account } from './checkin/types';
 import { buildThreads } from './threads';
 import type { InboxEvent } from './types';
@@ -29,7 +29,7 @@ type Txn = { vendor: string; amount: number; occurred_at: string };
 export async function loadHome(db: SupabaseClient, now: Date = new Date()): Promise<HomeData> {
   const since = new Date(now.getTime() - 35 * DAY).toISOString();
   const [accounts, txRes, evRes] = await Promise.all([
-    loadAccounts(db),
+    Promise.resolve(accountsFromSample(now)),
     db.from('transactions').select('vendor, amount, method, occurred_at').gte('occurred_at', since),
     db.from('inbox_events').select('*').eq('source', 'invoicing'),
   ]);
@@ -85,6 +85,15 @@ export async function loadHome(db: SupabaseClient, now: Date = new Date()): Prom
     credit: { balance: round2(sum(cardThisMonth.map(t => Number(t.amount)))), limit: CARD_LIMIT },
     invoicesUnpaid: round2(unpaid),
   };
+}
+
+/** Checking and treasury from src/data/business-health/company.json (the same numbers Business health uses). */
+function accountsFromSample(now: Date): Account[] {
+  const at = now.toISOString();
+  return [
+    { id: 'checking', name: company.checking.name, last4: company.checking.last4, balance: company.checking.balance, updated_at: at },
+    { id: 'treasury', name: company.treasury.name, last4: company.treasury.last4, balance: company.treasury.balance, updated_at: at },
+  ];
 }
 
 function sumAfter(xs: Txn[], cutoff: number, now: Date) {

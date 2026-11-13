@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { useCheckin } from '@/components/checkin/shared';
+import { useHealth } from '@/components/health/use-health';
 import { PageHeader } from '@/components/shell/page-header';
 import { SourceIcon } from '@/components/shell/source-icon';
 import { useViewer } from '@/components/shell/viewer';
@@ -71,7 +71,7 @@ function Inbox() {
 
   const url = `/api/events?status=${tab}${source ? `&source=${source}` : ''}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
   const { data, loading } = useLive<{ threads: InboxThread[] }>(url, ['inbox_events']);
-  const { data: checkin } = useCheckin();
+  const { data: health } = useHealth();
   const threads = useMemo(() => data?.threads ?? [], [data]);
 
   // Flash rows that arrived since the last load (Realtime inserts).
@@ -128,10 +128,10 @@ function Inbox() {
         }
       />
 
-      {checkin && checkin.cards.length > 0 && tab === 'inbox' && (
-        <Link href="/checkin" className="mb-4 flex items-center gap-3 rounded-lg border border-mint bg-positive-subtle px-4 py-3 text-[13px] hover:bg-positive-bg/40">
+      {health && health.needs_you.cards.length > 0 && tab === 'inbox' && (
+        <Link href="/business-health" className="mb-4 flex items-center gap-3 rounded-lg border border-mint bg-positive-subtle px-4 py-3 text-[13px] hover:bg-positive-bg/40">
           <CalendarCheck className="size-4 text-brand" />
-          <span><span className="font-semibold">Monday Check-in:</span> {checkin.cards.length} {checkin.cards.length === 1 ? 'thing needs' : 'things need'} you this week, with everything prepared.</span>
+          <span><span className="font-semibold">Business health:</span> {health.needs_you.cards.length} {health.needs_you.cards.length === 1 ? 'thing needs' : 'things need'} you, starting with “{health.needs_you.cards[0].title}”</span>
           <span className="ml-auto flex items-center gap-1 font-medium text-brand">Open <ArrowRight className="size-3.5" /></span>
         </Link>
       )}

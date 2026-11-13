@@ -3,13 +3,14 @@ import {
   ArrowLeftRight, ArrowRight, ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronRight, CreditCard, Gift, Landmark, Send, Vault,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useCheckin } from '@/components/checkin/shared';
+import { useHealth } from '@/components/health/use-health';
 import { BalanceChart } from '@/components/home/balance-chart';
 import { Card, HeaderButton, MonthNav, PageHeader } from '@/components/shell/page-header';
 import { NewBadge } from '@/components/shell/sidebar';
 import { useViewer } from '@/components/shell/viewer';
 import { useLive } from '@/hooks/use-live';
 import { formatUSD } from '@/lib/format';
+import { longDay } from '@/lib/health/dates';
 import type { HomeData } from '@/lib/home';
 
 const LOGO_COLORS = ['#151716', '#048d73', '#5a4bd1', '#1c5f80', '#b97800', '#c2316e'];
@@ -23,7 +24,7 @@ function greeting() {
 /** Home: Rho's dashboard layout, with this week's Check-in surfaced at the top. */
 export default function Home() {
   const { viewer } = useViewer();
-  const { data: checkin } = useCheckin();
+  const { data: health } = useHealth();
   const { data: home } = useLive<HomeData>('/api/home', ['accounts', 'transactions', 'inbox_events']);
 
   return (
@@ -45,14 +46,22 @@ export default function Home() {
 
       {/* The prototype's feature, sitting on top of Rho's dashboard */}
       <Card
-        title={<>Monday Check-in <NewBadge /></>}
-        action={<Link href="/checkin" className="text-[12px] font-semibold text-brand hover:underline">Open Check-in</Link>}
+        title={<>Business health <NewBadge /></>}
+        action={<Link href="/business-health" className="text-[12px] font-semibold text-brand hover:underline">Open Business health</Link>}
         className="mb-7"
       >
         <ol className="divide-y">
-          {checkin?.cards.map((c, i) => (
+          {health && !health.ready && health.invoice && (
+            <li className="flex items-center gap-4 px-5 py-3 text-[13px]">
+              <span className="flex-1">Rho found a {formatUSD(health.invoice.amount)} invoice from {health.invoice.vendor}, due {longDay(health.invoice.due)}. Nothing to decide yet.</span>
+            </li>
+          )}
+          {health?.approval && health.invoice && (
+            <li className="px-5 py-3 text-[13px] font-semibold text-positive">The ${health.invoice.amount / 1000}K invoice is covered and scheduled.</li>
+          )}
+          {health?.needs_you.cards.map((c, i) => (
             <li key={c.id}>
-              <Link href={`/checkin/${c.id}`} className="flex items-center gap-4 px-5 py-3 text-[13px] hover:bg-[#f7f9f8]">
+              <Link href={c.href} className="flex items-center gap-4 px-5 py-3 text-[13px] hover:bg-[#f7f9f8]">
                 <span className="w-3 text-muted-foreground">{i + 1}</span>
                 {c.urgent && <span className="rounded bg-negative-bg px-1.5 py-px text-[10px] font-semibold text-negative">Urgent</span>}
                 <span className="flex-1"><span className="font-semibold">{c.title}</span>{c.question ? ` ${c.question}` : ''}</span>
@@ -60,12 +69,11 @@ export default function Home() {
               </Link>
             </li>
           ))}
-          {checkin && !checkin.cards.length && <li className="px-5 py-3 text-[13px]">Nothing needs a decision this week.</li>}
         </ol>
-        {checkin && (
+        {health?.ready && (
           <div className="flex items-center justify-between border-t px-5 py-2.5 text-[12px] text-muted-foreground">
-            <span>+ {checkin.others.length} other things look fine</span>
-            <Link href="/inbox" className="font-semibold text-foreground hover:underline">Open Inbox</Link>
+            <span>+ {health.needs_you.others} other things look fine</span>
+            <span>Sample data</span>
           </div>
         )}
       </Card>

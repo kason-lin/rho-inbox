@@ -1,45 +1,41 @@
-# 90-second demo: “Kason's Monday”
+# 90-second demo: "The invoice nobody entered"
 
-**One story:** Kason Lin founded Loop Labs (6 people). It's Monday, 8:00 AM. Payroll is due Friday, and there's no time to check five tabs.
+**One story:** Kason Lin runs Loop Labs, a 12-person startup on Rho. An agency's $55K invoice sat in email for weeks. Rho finds it, sees checking will come up short, and gets the fix approved in one tap.
 
-**The point to land:** Rho already has the data. Check-in does the prep work, so Kason just says yes or no, and nothing moves without a tap.
+**The point to land:** Rho already has the bank data. Connect your inbox and tools (read-only), and Rho sees what you owe before it's due. You just say yes.
 
-## Before you start (2 minutes, off stage)
+## Before you start (1 minute)
 
-1. `npm run seed` to reset to Monday morning: 3 cards, 14 "looks fine".
-2. Make sure the dev server is running, then open **`http://localhost:3100/mail?as=kason`** in a full-width window.
-3. Open **`/architecture`** in a second tab and leave it for the end.
-4. Close other tabs, turn on Do Not Disturb, and zoom the browser to 110% if the room is big.
+1. Open **https://rho-inbox.vercel.app/business-health/connect** (or `localhost:3100` locally) in a full-width window.
+2. Click **Reset demo** in the dark bar at the top. It should say **Oct 3**.
+3. Turn on Do Not Disturb. Zoom the browser to 110% if the room is big.
 
-Optional: add `ANTHROPIC_API_KEY` to `.env.local` so the summary badge says “Written by Claude”. The template version works the same.
+The dark bar is for you, the presenter. It shows the steps in order, the demo date and Reset.
 
 ## The script
 
-| Time | Show / click | Say |
+| Time | Click | Say |
 | --- | --- | --- |
-| **0:00** | The Monday email (`/mail`) | “Every founder at a small company checks Cards, Bill Pay, Invoicing and Treasury separately. Rho already has all of that data. So here's Rho Check-in: one email on Monday morning.” |
-| **0:10** | Point at **“3 things need you”** and the summary | “Rho did the prep. Three decisions, ranked: urgent first, then by how many days of runway each one is worth. Everything else is one line: fourteen things checked, all fine.” |
-| **0:18** | Click **Review the $5,000 transfer** | “Payroll is Friday. Rho shows its work: $16,000 due, $11,800 in checking, $4,200 short, and Treasury can cover it.” |
-| **0:28** | Click **Move $5,000 to checking** to open the confirm screen | “Before anything moves: from, to, amount, date, approver. Only between our own accounts, and only an admin can approve.” |
-| **0:35** | Click **Approve** | “Payroll is covered. Balances update, and the next card is already waiting.” |
-| **0:40** | Click **Review it**, then **Why am I seeing this?** | “Every card explains itself. Nobody has signed in to Mixpanel in 60 days, which is $3,000 a year. If Rho gets it wrong, one tap mutes the rule, and the engine learns.” |
-| **0:50** | Sidebar → **Inbox** | “The same decisions live in one inbox across every Rho product: Needs action on top, FYI below, actions right on the row.” |
-| **0:57** | **Simulate event → Duplicate charge** | “Now a vendor double-bills us…” *(the row appears live, highlighted)* “…AWS charged us twice in nine days. Urgent, top of the inbox, no refresh.” |
-| **1:05** | Hover the row → **Dispute** | “One tap to dispute, with a provisional credit while it's reviewed. The thread updates itself.” |
-| **1:10** | Avatar → **Ana Costa** (teammate), open the **Burn** card | “Not everyone sees everything. Ana can see the burn card, but payroll is hidden, and she can't approve.” |
-| **1:17** | Switch to the **Architecture** tab | “It's built the way Rho already works: product events in, one normalized feed, a ranking engine, and every action goes back through each product's own API, within your existing approval rules, with an audit trail.” |
-| **1:27** | Stay on the diagram | “Rho does the prep. The founder just says yes. Thank you.” |
+| **0:00** | Connect tools → **Connect all (read-only)** | "Loop Labs banks with Rho. It connects its inbox, Stripe, payroll and Claude usage, all read-only. Rho can look, never write." |
+| **0:10** | Bar → **2 Inbox**, open **Northbeam Studio** | "October 3rd: our design agency sends a $55,000 invoice for the app redesign, due in 60 days. It sits in email. Nobody enters it anywhere, but Rho noticed it." |
+| **0:22** | Bar → **Nov 18** | "Fast-forward to November 18th, two weeks before it's due." *(the alert appears)* "Rho sends one alert, by text and email: a $55K invoice due in 14 days, and checking will be $19,800 short." |
+| **0:32** | Email → **Review** | "This is Business health, a new tab next to Home." |
+| **0:36** | Point at the **Coming up** chart | "Checking today is $62,400. Friday payroll takes $41,200, Stripe pays us $14,000, and then the invoice lands. We're $19,800 short on December 2nd. Every line links to its source." |
+| **0:48** | **Needs you** → **Review** → **Review the fix** | "Rho shows its work: the invoice and its email, what's due before it, the balances. Then the fix: move $25,000 from treasury and pay on the due date." |
+| **0:58** | Change the amount to **15000**, then back to **25000** | "It's editable. Too little, and it tells you you're still short." |
+| **1:03** | **Approve** | "One tap. The gap is gone, the invoice is scheduled, and there's a receipt. Today Rho's connection is read-only, so writes like this are the next step with Rho." |
+| **1:13** | **Next: where the money goes** → tap **Building the product** | "Same idea for spend. The $50,000 Claude bill: $32,000 building the product, $18,000 running it for customers, matched to the card charge to the dollar." |
+| **1:25** | Stay on the split | "Rho does the prep. The founder just says yes." |
 
 ## If something goes wrong
 
-- **The duplicate charge doesn't appear within about 3 seconds:** refresh the Inbox. The event is already saved; only the live push was slow. Say: “In production this arrives as a push notification.”
-- **“No recent subscription charge left to duplicate”:** you've already simulated several. Use **Simulate event → Unusual card charge** instead, or reset with `npm run seed`.
-- **The first card already says approved:** the data wasn't reset. Run `npm run seed` and reload.
-- **You're stuck as Ana:** open any page with `?as=kason`.
+- **The alert says "No alert yet":** the date is still Oct 3. Click **Nov 18** in the bar.
+- **It says the invoice is "already covered":** you approved in an earlier run. Click **Reset demo**.
+- **A page looks empty:** refresh it. The demo state lives in your browser, so it survives refreshes.
 
 ## Likely questions
 
-- **“Does it really move money?”** Not in the prototype. Approving writes the new balances and a confirmation event into the demo database. In production it would call Treasury's transfer API with Rho's existing approval rules.
-- **“Why only three cards?”** Relevance over volume. A card only shows up if it's urgent or worth 3+ days of runway, so the briefing stays readable. Unused tools are the exception because they're pure waste.
-- **“What did the AI do?”** It writes the three-sentence summary from the same numbers the viewer is allowed to see. The decisions come from transparent rules, which is why every card can say exactly why it's there.
-- **“How does it learn?”** “This is wrong” mutes that rule for that vendor. Two “Not now” taps double the bar for that card type. All of it is stored and audited.
+- **Does it really move money?** No. It's sample data and a mock approval. In a real build the transfer would run on Rho Treasury and the payment on Rho Bill Pay, within Rho's approval rules.
+- **How does it find the invoice?** A read-only inbox connection reads the email and pulls out the amount, date and terms. In production it would hand the invoice to Rho's AP inbox, where OCR makes the draft bill.
+- **Why $25,000 and not $19,800?** It's the shortfall plus a buffer, rounded up to $5,000, so a late payout doesn't put checking at $0. You can change it before approving.
+- **Why only 3 cards?** Relevance over volume: urgent first, then by impact on runway. Everything else is one line, "14 other things look fine."
