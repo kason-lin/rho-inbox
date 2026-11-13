@@ -1,78 +1,125 @@
 'use client';
 /**
- * Projected checking balance, day by day, drawn as steps (money moves on a day, then stays put).
- * Below $0 is tinted red, the invoice's due date is marked, and after approval the old line stays
- * behind as a dashed "before" line so you can see what changed.
+ * Projected checking, drawn exactly like Rho's Home balance chart: teal line on a dotted grid, values on
+ * the right, dates underneath. Anything below $0 turns red, the lowest day gets a label, and after approval
+ * the old projection stays behind as a dashed line. Hover any day to see its balance and what moved it.
  */
-import { shortDay } from '@/lib/health/dates';
+import { useRef, useState } from 'react';
 import type { Forecast } from '@/lib/health/forecast';
-import { formatUSDShort } from '@/lib/format';
+import { formatUSD } from '@/lib/format';
+import { cn } from 'cn';
 
-const W = 760, H = 250, PL = 58, PR = 16, PT = 14, PB = 30;
-const STEPS = [5000, 10000, 20000, 25000, 50000, 100000, 250000];
-const axis = (v: number) => (v === 0 ? '$0' : `${v < 0 ? '−' : ''}$${Math.abs(v / 1000)}K`);
+const compact = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 });
+const day = (d: string, opts: Intl.DateTimeFormatOptions) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { ...opts, timeZone: 'UTC' });
+const money = (n: number) => formatUSD(n).replace('-', '−');
 
-export function CashChart({ forecast, before, dueDate }: { forecast: Forecast; before?: Forecast | null; dueDate?: string }) {
-  const days = forecast.series.map(p => p.date);
-  const all = [...forecast.series, ...(before?.series ?? [])].map(p => p.balance);
-  const step = STEPS.find(s => (Math.max(...all, 0) - Math.min(...all, 0)) / s <= 6) ?? 500000;
-  const min = Math.floor(Math.min(...all, 0) / step) * step - (Math.min(...all) < 0 ? step / 4 : 0);
-  const max = Math.ceil(Math.max(...all, 0) / step) * step;
+export function CashChart({ forecast, before, dueDate, height = 200 }: { forecast: Forecast; before?: Forecast | null; dueDate?: string; height?: number }) {
+  const s = forecast.series;
+  const all = [...s, ...(before?.series ?? [])].map(p => p.balance);
+  const lo = Math.min(...all, 0);
+  const hi = Math.max(...all, 0);
+  const pad = (hi - lo) * 0.14;
+  const min = lo - pad;
+  const max = hi + pad;
+  const x = (i: number) => (i / (s.length - 1)) * 1000;
+  const y = (v: number) => 100 - ((v - min) / (max - min)) * 100;
+  const path = (f: Forecast) => f.series.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.balance).toFixed(2)}`).join(' ');
+  const line = path(forecast);
+  const zero = y(0);
+  const ticks = [0, 1, 2, 3].map(i => max - ((max - min) * (i + 0.5)) / 4);
 
-  const x = (i: number) => PL + (i * (W - PL - PR)) / (days.length - 1);
-  const y = (v: number) => PT + ((max - v) * (H - PT - PB)) / (max - min);
-  const path = (f: Forecast) => f.series.map((p, i) => (i ? `L${x(i)},${y(f.series[i - 1].balance)} L${x(i)},${y(p.balance)}` : `M${x(0)},${y(p.balance)}`)).join(' ');
-
+  const lowIdx = s.findIndex(p => p.date === forecast.low.date);
+  const dueIdx = dueDate ? s.findIndex(p => p.date === dueDate) : -1;
+  const markIdx = forecast.shortfall > 0 ? lowIdx : dueIdx >= 0 ? dueIdx : lowIdx;
   const short = forecast.shortfall > 0;
-  const ticks: number[] = [];
-  for (let v = Math.ceil(min / step) * step; v <= max; v += step) ticks.push(v);
-  const di = dueDate ? days.indexOf(dueDate) : -1;
-  const atDue = di >= 0 ? forecast.series[di].balance : null;
-  const line = short ? '#151716' : '#048d73';
+
+  const box = useRef<HTMLDivElement>(null);
+  const [hover, setHover] = useState<number | null>(null);
+  function onMove(e: React.MouseEvent) {
+    const r = box.current!.getBoundingClientRect();
+    setHover(Math.max(0, Math.min(s.length - 1, Math.round(((e.clientX - r.left) / r.width) * (s.length - 1)))));
+  }
+  const pct = (i: number) => `${(x(i) / 1000) * 100}%`;
+  const shown = hover ?? markIdx;
+  const events = forecast.events.filter(e => e.date === s[shown].date);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img"
-      aria-label={`Projected checking from ${shortDay(days[0])} to ${shortDay(days[days.length - 1])}; lowest ${formatUSDShort(forecast.low.balance)} on ${shortDay(forecast.low.date)}`}>
-      {ticks.map(v => (
-        <g key={v}>
-          <line x1={PL} x2={W - PR} y1={y(v)} y2={y(v)} stroke={v === 0 ? '#454a48' : '#e9edeb'} strokeWidth={v === 0 ? 1.2 : 1} />
-          <text x={PL - 8} y={y(v) + 4} textAnchor="end" fontSize="11" fill="#6b716e" className="font-mono">{axis(v)}</text>
-        </g>
-      ))}
-      {days.map((d, i) => (i % 3 === 0 || i === days.length - 1) && (
-        <text key={d} x={x(i)} y={H - 8} textAnchor="middle" fontSize="11" fill="#6b716e" className="font-mono">{shortDay(d)}</text>
-      ))}
-      {min < 0 && <rect x={PL} y={y(0)} width={W - PL - PR} height={y(min) - y(0)} fill="#db1a2d" opacity="0.05" />}
-      {di >= 0 && (
-        <>
-          <line x1={x(di)} x2={x(di)} y1={PT} y2={H - PB} stroke="#db1a2d" strokeDasharray="4 4" />
-          <text x={x(di) - 6} y={PT + 12} textAnchor="end" fontSize="11" fill="#db1a2d" className="font-mono">Invoice due</text>
-        </>
-      )}
-      {before && <path d={path(before)} fill="none" stroke="#c4cecb" strokeWidth="2" strokeDasharray="5 5" />}
-      <path d={`${path(forecast)} L${x(days.length - 1)},${y(0)} L${x(0)},${y(0)} Z`} fill={short ? '#81a5a9' : '#6af3d9'} opacity="0.16" />
-      <path d={path(forecast)} fill="none" stroke={line} strokeWidth="2.4" />
-      {atDue !== null && (
-        <>
-          <circle cx={x(di)} cy={y(atDue)} r="5" fill={atDue < 0 ? '#db1a2d' : '#048d73'} stroke="#fff" strokeWidth="2" />
-          <text x={x(di) - 10} y={y(atDue) - 10} textAnchor="end" fontSize="12" fontWeight="600" fill={atDue < 0 ? '#db1a2d' : '#0d7764'} className="font-mono">
-            {formatUSDShort(atDue).replace('-', '−')}
-          </text>
-        </>
-      )}
-    </svg>
+    <div className="relative" aria-label={`Projected checking: lowest ${money(forecast.low.balance)} on ${day(forecast.low.date, { month: 'short', day: 'numeric' })}`}>
+      <div className="flex">
+        <div
+          ref={box}
+          onMouseMove={onMove}
+          onMouseLeave={() => setHover(null)}
+          className="relative flex-1 cursor-crosshair"
+          style={{ height, backgroundImage: 'radial-gradient(circle, #dfe6e3 1px, transparent 1.3px)', backgroundSize: '12px 12px' }}
+        >
+          <svg viewBox="0 0 1000 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
+            <defs>
+              <linearGradient id="cash-fill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stopColor="#3ecfa3" stopOpacity="0.16" />
+                <stop offset="1" stopColor="#3ecfa3" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="cash-fill-red" x1="0" x2="0" y1="1" y2="0">
+                <stop offset="0" stopColor="#db1a2d" stopOpacity="0.18" />
+                <stop offset="1" stopColor="#db1a2d" stopOpacity="0.02" />
+              </linearGradient>
+              <clipPath id="above-zero"><rect x="-10" y="-10" width="1020" height={zero + 10} /></clipPath>
+              <clipPath id="below-zero"><rect x="-10" y={zero} width="1020" height={110 - zero} /></clipPath>
+            </defs>
+            {/* fills: teal under the line above $0, red between the line and $0 below it */}
+            <path d={`${line} L1000,${Math.min(zero, 100)} L0,${Math.min(zero, 100)} Z`} fill="url(#cash-fill)" clipPath="url(#above-zero)" />
+            {short && <path d={`${line} L1000,${zero} L0,${zero} Z`} fill="url(#cash-fill-red)" clipPath="url(#below-zero)" />}
+            <line x1="0" x2="1000" y1={zero} y2={zero} stroke="#b8c2bf" strokeDasharray="3 4" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            {before && <path d={path(before)} fill="none" stroke="#b8c2bf" strokeWidth="1.5" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />}
+            <path d={line} fill="none" stroke="#3ecfa3" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" clipPath="url(#above-zero)" />
+            <path d={line} fill="none" stroke="#db1a2d" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" clipPath="url(#below-zero)" />
+          </svg>
+
+          <span className="absolute left-1 -translate-y-full pb-0.5 text-[10px] text-muted-foreground" style={{ top: `${zero}%` }}>$0</span>
+
+          {/* guide line + dot for the shown day */}
+          <span className="pointer-events-none absolute top-0 bottom-0 w-px bg-[#cfd8d5]" style={{ left: pct(shown) }} />
+          <span
+            className={cn('pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow', s[shown].balance < 0 ? 'bg-[#db1a2d]' : 'bg-[#3ecfa3]')}
+            style={{ left: pct(shown), top: `${y(s[shown].balance)}%` }}
+          />
+
+          {/* tooltip, Rho-style white card */}
+          <div
+            className="pointer-events-none absolute z-10 w-max max-w-[220px] rounded-lg border bg-white px-3 py-2 text-[12px] shadow-[0_4px_16px_rgba(21,23,22,0.08)]"
+            style={{
+              left: pct(shown),
+              top: `${y(s[shown].balance)}%`,
+              transform: `translate(${shown > s.length * 0.6 ? 'calc(-100% - 12px)' : '12px'}, ${y(s[shown].balance) > 50 ? 'calc(-100% - 10px)' : '10px'})`,
+            }}
+          >
+            <div className="text-[11px] text-muted-foreground">{day(s[shown].date, { weekday: 'short', month: 'short', day: 'numeric' })}{hover === null && short ? ' · lowest' : ''}</div>
+            <div className={cn('tabular text-[14px] font-semibold', s[shown].balance < 0 ? 'text-negative' : 'text-foreground')}>{money(s[shown].balance)}</div>
+            {events.map(e => (
+              <div key={e.id} className="mt-0.5 flex justify-between gap-3 text-[11px] text-ink-2">
+                <span className="truncate">{e.kind === 'invoice' ? e.label.split(' · ')[0] : e.kind === 'payroll' ? 'Payroll' : e.kind === 'payout' ? 'Stripe payout' : 'From Treasury'}</span>
+                <span className={cn('tabular', e.amount > 0 && 'text-positive')}>{e.amount > 0 ? '+' : '−'}{formatUSD(Math.abs(e.amount)).replace('.00', '')}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex w-14 flex-col justify-around pl-3 text-[10px] text-muted-foreground tabular">
+          {ticks.map(t => <span key={t}>{compact.format(t).replace('-', '−')}</span>)}
+        </div>
+      </div>
+      <div className="mt-2 mr-14 flex justify-between text-[10px] text-muted-foreground">
+        {s.filter((_, i) => i % 2 === 0).map(p => <span key={p.date}>{day(p.date, { month: 'short', day: 'numeric' })}</span>)}
+      </div>
+    </div>
   );
 }
 
 export function ChartLegend({ approved }: { approved: boolean }) {
-  const items: [string, string, boolean?][] = [[approved ? '#048d73' : '#151716', 'Projected checking'], ...(approved ? [['#c4cecb', 'Before set-aside', true] as [string, string, boolean]] : []), ['#db1a2d', 'Bill due', true]];
   return (
-    <div className="flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-muted-foreground">
-      {items.map(([c, l, dashed]) => (
-        <span key={l} className="flex items-center gap-1.5">
-          <i className="inline-block h-0 w-4 border-t-2" style={{ borderColor: c, borderStyle: dashed ? 'dashed' : 'solid' }} /> {l}
-        </span>
-      ))}
+    <div className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-muted-foreground">
+      <span className="flex items-center gap-1.5"><i className="inline-block h-0.5 w-3.5 rounded bg-[#3ecfa3]" /> Projected checking</span>
+      <span className="flex items-center gap-1.5"><i className="inline-block h-0.5 w-3.5 rounded bg-[#db1a2d]" /> Below $0</span>
+      {approved && <span className="flex items-center gap-1.5"><i className="inline-block w-3.5 border-t-[1.5px] border-dashed border-[#b8c2bf]" /> Before your approval</span>}
     </div>
   );
 }

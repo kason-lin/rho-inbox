@@ -184,7 +184,7 @@ function HealthScreen({ data, setSheet, goWhere, cancel }: { data: HealthView; s
         <div className="text-[12px] text-muted-foreground">Lowest checking, next 2 weeks</div>
         <div className={cn('text-[32px] font-medium tracking-tight tabular', low.balance < 0 ? 'text-negative' : 'text-positive')}>{formatUSDShort(low.balance).replace('-', '−')}</div>
         <div className="text-[12px] text-muted-foreground">on {shortDay(low.date)}{data.approval ? ' · after your set-aside' : ` · ${data.invoice?.vendor} invoice due`}</div>
-        <div className="mt-2"><CashChart forecast={data.forecast} before={data.forecast_before} dueDate={data.invoice?.due} /></div>
+        <div className="mt-2"><CashChart forecast={data.forecast} before={data.forecast_before} dueDate={data.invoice?.due} height={130} /></div>
       </div>
       <h3 className="pt-1 text-[18px] font-semibold">Needs you</h3>
       {data.needs_you.cards.map(c => (

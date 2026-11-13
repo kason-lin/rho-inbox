@@ -8,7 +8,7 @@
  *   Your metrics  a preview of the next phase
  * Proof opens in a side drawer; approving is a 2-step confirm with Undo.
  */
-import { CheckCircle2, Clock, Plug } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, CheckCircle2, Clock, Plug } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -24,7 +24,7 @@ import { Card, HeaderButton } from '@/components/shell/page-header';
 import { DEMO_DATES } from '@/lib/health/data';
 import { longDay, shortDay } from '@/lib/health/dates';
 import type { HealthView } from '@/lib/health/view';
-import { formatUSDShort } from '@/lib/format';
+import { formatUSD, formatUSDShort } from '@/lib/format';
 import { cn } from 'cn';
 
 type Overlay = 'proof' | 'confirm' | 'dispute' | 'specialist' | null;
@@ -86,12 +86,16 @@ export default function BusinessHealthPage() {
           )}
 
           <div className="mb-7 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
-            <Card title="Coming up" action={<span className="text-[12px] text-muted-foreground">Projected checking · next 2 weeks</span>}>
-              <div className="px-4 pt-4 pb-2">
+            <Card
+              title="Coming up"
+              action={<span className="flex gap-5 text-[12px] font-semibold"><span>Checking ••{data.accounts.checking.last4}</span><span>Next 2 weeks</span></span>}
+            >
+              <ProjectionHeader data={data} />
+              <div className="px-5 pb-4">
                 <CashChart forecast={data.forecast} before={data.forecast_before} dueDate={data.invoice?.due} />
-                <div className="mt-2 px-1"><ChartLegend approved={!!data.approval} /></div>
+                <div className="mt-3"><ChartLegend approved={!!data.approval} /></div>
               </div>
-              <div className="mt-2 border-t"><ComingUp data={data} /></div>
+              <div className="border-t"><ComingUp data={data} /></div>
             </Card>
 
             <Card
@@ -127,6 +131,28 @@ export default function BusinessHealthPage() {
   );
 }
 
+/** Like Home's Balance card: the number first, then money in / money out, then the status. */
+function ProjectionHeader({ data }: { data: HealthView }) {
+  const f = data.forecast!;
+  const inflow = f.events.filter(e => e.amount > 0).reduce((t, e) => t + e.amount, 0);
+  const outflow = f.events.filter(e => e.amount < 0).reduce((t, e) => t + e.amount, 0);
+  return (
+    <div className="px-5 pt-4 pb-3">
+      <div className="text-[12px] text-muted-foreground">Checking today</div>
+      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span className="tabular text-[26px] font-medium tracking-tight">{formatUSD(f.opening)}</span>
+        <span className="flex flex-wrap items-center gap-3 text-[11px] text-ink-2">
+          <span className="flex items-center gap-1"><span className="grid size-4 place-items-center rounded-full bg-positive-bg text-positive"><ArrowDownLeft className="size-2.5" /></span>{formatUSD(inflow)}</span>
+          <span className="flex items-center gap-1"><span className="grid size-4 place-items-center rounded-full bg-negative-bg text-negative"><ArrowUpRight className="size-2.5" /></span>{formatUSD(outflow)}</span>
+          {f.shortfall > 0
+            ? <span className="rounded-full bg-negative-bg px-2 py-0.5 font-semibold text-negative">{formatUSD(f.shortfall)} short on {shortDay(f.low.date)}</span>
+            : <span className="rounded-full bg-positive-bg px-2 py-0.5 font-semibold text-positive">Lowest {formatUSD(f.low.balance)} on {shortDay(f.low.date)}</span>}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Kpis({ data }: { data: HealthView }) {
   const k = data.kpis;
   const tiles: { label: string; value: string; sub: string; tone?: 'red' | 'teal' | 'up' }[] = [
@@ -138,12 +164,12 @@ function Kpis({ data }: { data: HealthView }) {
     { label: 'Runway', value: `${k.runway} mo`, sub: `was ${k.runway_was.toFixed(1)} in October` },
   ];
   return (
-    <div className="mb-7 grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border lg:grid-cols-4">
+    <div className="mb-7 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
       {tiles.map(t => (
-        <div key={t.label} className="bg-white px-5 py-4">
+        <div key={t.label} className="rounded-lg border bg-white px-5 py-4">
           <div className="text-[12px] text-muted-foreground">{t.label}</div>
-          <div className={cn('mt-1 text-[24px] font-medium tracking-tight tabular', t.tone === 'red' && 'text-negative', t.tone === 'teal' && 'text-positive')}>{t.value}</div>
-          <div className={cn('mt-0.5 text-[12px] text-muted-foreground', t.tone === 'up' && 'text-warning')}>{t.sub}</div>
+          <div className={cn('mt-1 text-[20px] font-medium tracking-tight tabular', t.tone === 'red' && 'text-negative', t.tone === 'teal' && 'text-positive')}>{t.value}</div>
+          <div className={cn('mt-1 text-[11px] text-muted-foreground', t.tone === 'up' && 'text-warning')}>{t.sub}</div>
         </div>
       ))}
     </div>
