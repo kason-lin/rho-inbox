@@ -1,15 +1,10 @@
 /**
  * End-to-end check against a running dev server: the Business health story from start to finish
- * (with its own demo cookie, like a browser), plus the Rho Inbox. Run `npm run seed` before and after.
+ * (with its own demo cookie, like a browser). Nothing to seed: all data is in src/data/business-health/.
  *
  *   npm run dev -- -p 3100   (in another terminal)
- *   npm run seed && npm run smoke && npm run seed
+ *   npm run smoke
  */
-import { config } from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
-import type { InboxThread } from '../src/lib/types';
-
-config({ path: '.env.local', quiet: true });
 const BASE = process.env.BASE_URL ?? 'http://localhost:3100';
 
 let failures = 0;
@@ -62,38 +57,6 @@ async function main() {
 
   await call('POST', '/api/health/reset');
   check('   Reset demo goes back to Oct 3', (await call('GET', '/api/health/state')).body.date === '2026-10-03');
-
-  // ---------- Rho Inbox ----------
-  const threads = async (q = '') => (await call('GET', `/api/events${q}`)).body.threads as InboxThread[];
-  check('Inbox lists the feed', (await threads()).length >= 15);
-  check('Inbox filters by source', (await threads('?source=cards')).every(t => t.source === 'cards'));
-  check('Inbox search', (await threads('?q=northwind')).length === 1);
-  check('Inbox rejects bad filters', (await call('GET', '/api/events?source=crypto')).status === 400);
-
-  const browser = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const attempt = await browser.from('inbox_events').delete().neq('id', '00000000-0000-0000-0000-000000000000').select();
-  check('browser key is read-only', (attempt.data ?? []).length === 0);
-
-  const live = new Promise<string>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('no realtime insert within 10s')), 10_000);
-    const channel = browser
-      .channel('smoke')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'inbox_events' }, payload => {
-        clearTimeout(timer);
-        browser.removeChannel(channel);
-        resolve((payload.new as { title: string }).title);
-      })
-      .subscribe(async status => {
-        if (status !== 'SUBSCRIBED') return;
-        await new Promise(r => setTimeout(r, 1000));   // listeners attach a beat after SUBSCRIBED
-        await call('POST', '/api/simulate', { scenario: 'card_charge' });
-      });
-  });
-  try {
-    check('a simulated event arrives live', true, await live);
-  } catch (e) {
-    check('a simulated event arrives live', false, (e as Error).message);
-  }
 
   console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed');
   process.exit(failures ? 1 : 0);

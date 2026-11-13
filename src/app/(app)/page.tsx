@@ -8,7 +8,7 @@ import { BalanceChart } from '@/components/home/balance-chart';
 import { Card, HeaderButton, MonthNav, PageHeader } from '@/components/shell/page-header';
 import { NewBadge } from '@/components/shell/sidebar';
 import { useViewer } from '@/components/shell/viewer';
-import { useLive } from '@/hooks/use-live';
+import { useEffect, useState } from 'react';
 import { formatUSD } from '@/lib/format';
 import { longDay } from '@/lib/health/dates';
 import type { HomeData } from '@/lib/home';
@@ -25,7 +25,8 @@ function greeting() {
 export default function Home() {
   const { viewer } = useViewer();
   const { data: health } = useHealth();
-  const { data: home } = useLive<HomeData>('/api/home', ['accounts', 'transactions', 'inbox_events']);
+  const [home, setHome] = useState<HomeData | null>(null);
+  useEffect(() => { fetch('/api/home').then(r => r.json()).then(setHome); }, []);
 
   return (
     <>

@@ -1,24 +1,25 @@
 'use client';
+/**
+ * Who the demo is "logged in" as. There's no real login in the prototype; the avatar menu (or ?as= in
+ * the URL) picks Kason (founder, admin), Jordan (admin), Ana (teammate) or Dana (Rho account manager).
+ */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import type { AppUser } from '@/lib/checkin/types';
-import { viewerId } from '@/lib/checkin/viewer-id';
+import usersFile from '@/data/business-health/users.json';
+import { viewerId } from '@/lib/health/viewer-id';
 
-const FALLBACK: AppUser = { id: 'kason', name: 'Kason Lin', title: 'Founder & CEO', role: 'admin' };
-const KEY = 'rho-inbox:viewer';
+export type Role = 'admin' | 'member' | 'account_manager';
+export type AppUser = { id: string; name: string; title: string; role: Role };
+
+const USERS = usersFile.users as AppUser[];
+const KEY = 'rho-demo:viewer';
 
 type ViewerState = { viewer: AppUser; users: AppUser[]; setViewer: (id: string) => void };
-const ViewerContext = createContext<ViewerState>({ viewer: FALLBACK, users: [FALLBACK], setViewer: () => {} });
+const ViewerContext = createContext<ViewerState>({ viewer: USERS[0], users: USERS, setViewer: () => {} });
 
-/**
- * Who the demo is "logged in" as. There's no real auth in the prototype; the role switcher in the
- * top bar picks Kason (founder, admin), Ana (teammate, payroll hidden) or Dana (Rho account manager).
- */
 export function ViewerProvider({ children }: { children: React.ReactNode }) {
-  const [users, setUsers] = useState<AppUser[]>([FALLBACK]);
   const [id, setId] = useState('kason');
 
   useEffect(() => {
-    // ?as=ana in the URL switches the viewer (handy for links in the demo script and for screenshots).
     const fromUrl = new URLSearchParams(window.location.search).get('as');
     try {
       if (fromUrl) localStorage.setItem(KEY, fromUrl);
@@ -27,15 +28,11 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
     } catch {
       if (fromUrl) setId(viewerId(fromUrl));   // storage can be blocked; the URL still works for this page
     }
-    fetch('/api/users')
-      .then(r => r.json())
-      .then(b => b.users && setUsers(b.users))
-      .catch(() => {});
   }, []);
 
   const value = useMemo<ViewerState>(() => ({
-    viewer: users.find(u => u.id === id) ?? FALLBACK,
-    users,
+    viewer: USERS.find(u => u.id === id) ?? USERS[0],
+    users: USERS,
     setViewer: (next: string) => {
       setId(next);
       try {
@@ -44,14 +41,14 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
         // ignore
       }
     },
-  }), [users, id]);
+  }), [id]);
 
   return <ViewerContext.Provider value={value}>{children}</ViewerContext.Provider>;
 }
 
 export const useViewer = () => useContext(ViewerContext);
 
-export const ROLE_LABEL: Record<AppUser['role'], string> = {
+export const ROLE_LABEL: Record<Role, string> = {
   admin: 'Admin',
   member: 'Teammate',
   account_manager: 'Rho account manager',

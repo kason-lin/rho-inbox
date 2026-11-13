@@ -3,8 +3,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { error, parseBody, route } from '@/lib/api';
-import { USERS } from '@/lib/checkin/demo-data';
-import { viewerId } from '@/lib/checkin/viewer-id';
+import usersFile from '@/data/business-health/users.json';
+import { viewerId } from '@/lib/health/viewer-id';
 import { validatePlan } from '@/lib/health/forecast';
 import { readState, writeState, type DemoState } from '@/lib/health/state';
 import { healthView, invoicesFor } from '@/lib/health/view';
@@ -16,7 +16,7 @@ export const POST = route(async (req: Request) => {
   if ('response' in body) return body.response;
   const state = await readState();
 
-  const user = USERS.find(u => u.id === viewerId(body.data.as));
+  const user = usersFile.users.find(u => u.id === viewerId(body.data.as));
   if (!user || user.role !== 'admin') return error(`${user?.name ?? 'This user'} can’t approve payments. An admin has to.`, 403);
   if (state.approval) return error('This plan is already approved. Use Reset demo to start over.', 409);
 

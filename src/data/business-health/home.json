@@ -1,0 +1,171 @@
+{
+  "_about": "Home dashboard sample numbers for Loop Labs on Wed Nov 18 (balance line, money in/out this month, card spend, unpaid customer invoices). Generated once from the sample transactions; edit freely.",
+  "series": [
+    {
+      "date": "2026-10-21",
+      "balance": 1319406.26
+    },
+    {
+      "date": "2026-10-22",
+      "balance": 1319406.26
+    },
+    {
+      "date": "2026-10-23",
+      "balance": 1319277.26
+    },
+    {
+      "date": "2026-10-24",
+      "balance": 1319277.26
+    },
+    {
+      "date": "2026-10-25",
+      "balance": 1319277.26
+    },
+    {
+      "date": "2026-10-26",
+      "balance": 1319277.26
+    },
+    {
+      "date": "2026-10-27",
+      "balance": 1318888.26
+    },
+    {
+      "date": "2026-10-28",
+      "balance": 1318888.26
+    },
+    {
+      "date": "2026-10-29",
+      "balance": 1277688.26
+    },
+    {
+      "date": "2026-10-30",
+      "balance": 1277688.26
+    },
+    {
+      "date": "2026-10-31",
+      "balance": 1277614.36
+    },
+    {
+      "date": "2026-11-01",
+      "balance": 1277614.36
+    },
+    {
+      "date": "2026-11-01",
+      "balance": 1277614.36
+    },
+    {
+      "date": "2026-11-02",
+      "balance": 1277518.22
+    },
+    {
+      "date": "2026-11-03",
+      "balance": 1277518.22
+    },
+    {
+      "date": "2026-11-04",
+      "balance": 1277268.22
+    },
+    {
+      "date": "2026-11-05",
+      "balance": 1277193.22
+    },
+    {
+      "date": "2026-11-06",
+      "balance": 1277145.34
+    },
+    {
+      "date": "2026-11-07",
+      "balance": 1277055.96
+    },
+    {
+      "date": "2026-11-08",
+      "balance": 1275771.79
+    },
+    {
+      "date": "2026-11-09",
+      "balance": 1275233.59
+    },
+    {
+      "date": "2026-11-10",
+      "balance": 1278385.59
+    },
+    {
+      "date": "2026-11-11",
+      "balance": 1278301.59
+    },
+    {
+      "date": "2026-11-12",
+      "balance": 1237014.09
+    },
+    {
+      "date": "2026-11-13",
+      "balance": 1236834.09
+    },
+    {
+      "date": "2026-11-14",
+      "balance": 1236569.21
+    },
+    {
+      "date": "2026-11-15",
+      "balance": 1236482.81
+    },
+    {
+      "date": "2026-11-16",
+      "balance": 1236448.21
+    },
+    {
+      "date": "2026-11-17",
+      "balance": 1242400
+    },
+    {
+      "date": "2026-11-18",
+      "balance": 1242400
+    }
+  ],
+  "last30": {
+    "inflows": 9200,
+    "outflows": 86206.26
+  },
+  "month": {
+    "label": "Nov 2026",
+    "outflows": 44414.36,
+    "topOutflows": [
+      {
+        "name": "Gusto payroll run",
+        "amount": 41200
+      },
+      {
+        "name": "Amazon Web Services",
+        "amount": 1284.17
+      },
+      {
+        "name": "Delta Air Lines",
+        "amount": 418.2
+      },
+      {
+        "name": "Mixpanel",
+        "amount": 250
+      },
+      {
+        "name": "Amazon Business",
+        "amount": 212.38
+      }
+    ],
+    "inflows": 9200,
+    "topInflows": [
+      {
+        "name": "Northwind Logistics",
+        "amount": 6000
+      },
+      {
+        "name": "Lumen Analytics",
+        "amount": 3200
+      }
+    ]
+  },
+  "credit": {
+    "balance": 3214.36,
+    "limit": 100000
+  },
+  "invoicesUnpaid": 4500
+}

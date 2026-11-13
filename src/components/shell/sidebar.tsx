@@ -1,11 +1,11 @@
 'use client';
 import {
   Banknote, BookOpen, Blocks, HeartPulse, ChartLine, ChevronDown, CreditCard, FileText, Gift, HandCoins,
-  House, Inbox, Landmark, Network, PanelLeft, Receipt, ScrollText, Settings, Store, Users,
+  House, Landmark, PanelLeft, Receipt, Settings, Store, Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useLive } from '@/hooks/use-live';
+import { useHealth } from '@/components/health/use-health';
 import { cn } from 'cn';
 
 type Item = { label: string; href: string; icon: React.ElementType; menu?: boolean; badge?: React.ReactNode };
@@ -47,18 +47,15 @@ export const NewBadge = () => (
 
 export function Sidebar() {
   const path = usePathname();
-  const { data } = useLive<{ unread: number; needs_action: number }>('/api/summary', ['inbox_events']);
-  const unread = data?.unread ?? 0;
+  const { data } = useHealth();
+  const open = data?.needs_you.cards.length ?? 0;
 
   // Rho's own navigation, with the prototype's features (Inbox, Check-in, Audit log, Architecture) added in.
   const main: Item[] = [
     { label: 'Home', href: '/', icon: House },
-    { label: 'Business health', href: '/business-health', icon: HeartPulse, badge: <NewBadge /> },
     {
-      label: 'Inbox', href: '/inbox', icon: Inbox,
-      badge: unread > 0 && (
-        <span className="tabular min-w-5 rounded-full bg-foreground px-1.5 text-center text-[10px] leading-4 font-semibold text-white">{unread}</span>
-      ),
+      label: 'Business health', href: '/business-health', icon: HeartPulse,
+      badge: open > 0 ? <span className="tabular min-w-5 rounded-full bg-negative px-1.5 text-center text-[10px] leading-4 font-semibold text-white">{open}</span> : <NewBadge />,
     },
     { label: 'Banking', href: '/soon/banking', icon: Landmark, menu: true },
     { label: 'Cards', href: '/soon/cards', icon: CreditCard, menu: true },
@@ -76,9 +73,7 @@ export function Sidebar() {
     { label: 'Users', href: '/soon/users', icon: Users, menu: true },
     { label: 'Integrations', href: '/soon/integrations', icon: Blocks },
     { label: 'Partner Perks', href: '/soon/partner-perks', icon: Gift },
-    { label: 'Audit log', href: '/audit', icon: ScrollText },
-    { label: 'Architecture', href: '/architecture', icon: Network },
-    { label: 'Settings', href: '/soon/settings', icon: Settings },
+    { label: 'Settings', href: '/settings/connected-tools', icon: Settings },
   ];
 
   return (
