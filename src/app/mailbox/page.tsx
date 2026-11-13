@@ -81,7 +81,7 @@ function Mailbox() {
             <div className="flex flex-1 items-center gap-3 rounded-full bg-[#e9eef6] px-4 py-2.5 text-[14px] text-[#444746]">
               <Search className="size-4" /> Search mail
             </div>
-            <span className="grid size-8 place-items-center rounded-full bg-[#fbe0ec] text-[12px] font-semibold text-[#c2316e]">KL</span>
+            <span className="grid size-8 place-items-center rounded-full bg-[#fbe0ec] text-[12px] font-semibold text-[#c2316e]">EL</span>
           </div>
 
           {!data && <p className="p-6 text-[14px] text-[#444746]">Loading…</p>}

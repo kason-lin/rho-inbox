@@ -22,7 +22,7 @@ export function AlertEmailBody({ data }: { data: HealthView }) {
         <span className="font-mono text-[10.5px] tracking-[0.06em] text-[#6af3d9] uppercase">Business health</span>
       </div>
       <div className="space-y-4 px-6 py-6 text-[14px] text-[#1b2122]">
-        <p>Hi {data.invoice_email ? 'Kason' : 'there'},</p>
+        <p>Hi {data.invoice_email ? 'Eric' : 'there'},</p>
         <Chip tone="red">Needs you · due {shortDay(alert.invoice.due)}</Chip>
         <h3 className="text-[20px] leading-snug font-normal tracking-[-0.01em] text-[#0c0f0f]">
           {alert.invoice.vendor}’s {formatUSDShort(alert.invoice.amount)} invoice is due in {alert.days_until_due} days. Checking will be {formatUSDShort(alert.short_by)} short.

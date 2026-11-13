@@ -1,7 +1,7 @@
 {
-  "_about": "People who can view the demo. Only admins can approve payments. Switch with the avatar menu or ?as=kason|ana|dana.",
+  "_about": "People who can view the demo. Only admins can approve payments. Switch with the avatar menu or ?as=eric|ana|dana.",
   "users": [
-    { "id": "kason", "name": "Kason Lin", "title": "Founder & CEO", "role": "admin" },
+    { "id": "eric", "name": "Eric Li", "title": "Founder & CEO", "role": "admin" },
     { "id": "jordan", "name": "Jordan Ellis", "title": "Co-founder & CTO", "role": "admin" },
     { "id": "ana", "name": "Ana Costa", "title": "Operations", "role": "member" },
     { "id": "dana", "name": "Dana Okafor", "title": "Rho account manager", "role": "account_manager" }

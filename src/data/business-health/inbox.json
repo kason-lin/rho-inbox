@@ -1,6 +1,6 @@
 {
   "_about": "Loop Labs' mock email inbox. The Business health backend reads these and pulls out invoices (amount, date, terms). Sample data: no real email is read.",
-  "owner": "kason@looplabs.example",
+  "owner": "eric@looplabs.example",
   "emails": [
     {
       "id": "em-northbeam-invoice",
@@ -9,7 +9,7 @@
       "from": "billing@northbeam.example",
       "subject": "Invoice NB-2026-104: Loop Labs app redesign",
       "attachment": "Northbeam_NB-2026-104.pdf · 212 KB",
-      "body": "Hi Kason,\n\nThank you again for working with us on the Loop Labs app redesign. Our invoice for the project is attached.\n\nInvoice: NB-2026-104\nInvoice date: October 3, 2026\n\nResearch and UX: $38,000.00\nVisual design and prototype: $17,000.00\nAmount due: $55,000.00\nPayment terms: Net 60\n\nBank details are on the attached PDF. Let us know if you have any questions.\n\nBest,\nAlex Moreno\nNorthbeam Studio"
+      "body": "Hi Eric,\n\nThank you again for working with us on the Loop Labs app redesign. Our invoice for the project is attached.\n\nInvoice: NB-2026-104\nInvoice date: October 3, 2026\n\nResearch and UX: $38,000.00\nVisual design and prototype: $17,000.00\nAmount due: $55,000.00\nPayment terms: Net 60\n\nBank details are on the attached PDF. Let us know if you have any questions.\n\nBest,\nAlex Moreno\nNorthbeam Studio"
     },
     {
       "id": "em-halcyon",
@@ -17,7 +17,7 @@
       "from_name": "Jamie Ortiz · Halcyon Health",
       "from": "jamie@halcyon.example",
       "subject": "Re: pilot kickoff next week",
-      "body": "Hi Kason,\n\nWe're all set for the pilot kickoff on Tuesday. Looking forward to it.\n\nJamie"
+      "body": "Hi Eric,\n\nWe're all set for the pilot kickoff on Tuesday. Looking forward to it.\n\nJamie"
     },
     {
       "id": "em-jordan",

@@ -23,7 +23,7 @@ async function main() {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
   // Home: Rho's dashboard, with Business health on top
-  await page.goto(`${BASE}/?as=kason`);
+  await page.goto(`${BASE}/?as=eric`);
   await page.getByText('Top outflows').waitFor();
   await page.request.post(`${BASE}/api/health/reset`);
   await shot(page, '00-home');

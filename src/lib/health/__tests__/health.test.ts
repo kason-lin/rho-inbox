@@ -57,7 +57,7 @@ describe('forecast and alert on Nov 18', () => {
 });
 
 describe('needs you', () => {
-  const approved = { ...nov18, approval: { transfer_amount: 25000, pay_date: '2026-12-02', approved_at: '', approved_by: 'Kason Lin', reference: 'BH-1' } };
+  const approved = { ...nov18, approval: { transfer_amount: 25000, pay_date: '2026-12-02', approved_at: '', approved_by: 'Eric Li', reference: 'BH-1' } };
 
   it('before approval: the invoice first, then the unused tool, then spend by purpose', () => {
     const v = healthView(nov18);

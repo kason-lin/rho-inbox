@@ -10,7 +10,7 @@
         "No sending, deleting or labeling"
       ],
       "color": "#ea4335",
-      "account": "kason@looplabs.example",
+      "account": "eric@looplabs.example",
       "reads": "Invoices and receipts: sender, amount, due date, attachment"
     },
     {

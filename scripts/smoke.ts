@@ -48,20 +48,20 @@ async function main() {
   const preview = (await call('GET', '/api/health/forecast?transfer=15000&pay_date=2026-12-02')).body.preview;
   check('4. editing to $15K previews a $4,800 gap', preview.shortfall === 4800);
   check('   a teammate can’t approve', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'ana' })).status === 403);
-  check('   paying after the due date is refused', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-03', as: 'kason' })).status === 422);
-  const approved = await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'kason' });
+  check('   paying after the due date is refused', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-03', as: 'eric' })).status === 422);
+  const approved = await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'eric' });
   check('   approve $25K + pay Dec 2: gap gone', approved.status === 200 && approved.body.forecast.shortfall === 0, `lowest ${approved.body.forecast?.low.balance}`);
   check('   invoice shows as scheduled, receipt exists', approved.body.obligations.find((o: { kind: string }) => o.kind === 'invoice').status === 'scheduled' && !!approved.body.approval.reference);
-  check('   approving twice is refused', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'kason' })).status === 409);
+  check('   approving twice is refused', (await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'eric' })).status === 409);
   check('   the Figma duplicate shows up next', approved.body.needs_you.cards[0].type === 'duplicate' && approved.body.forecast_before.shortfall === 19800);
 
   const undone = await call('POST', '/api/health/undo');
   check('   Undo brings the gap back', undone.body.approval === null && undone.body.forecast.shortfall === 19800);
-  await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'kason' });
+  await call('POST', '/api/health/approve', { transfer_amount: 25000, pay_date: '2026-12-02', as: 'eric' });
 
   check('   a teammate can’t dispute', (await call('POST', '/api/health/act', { card_id: 'dup-figma', action: 'dispute', as: 'ana' })).status === 403);
-  const disputed = await call('POST', '/api/health/act', { card_id: 'dup-figma', action: 'dispute', as: 'kason' });
-  const cancelled = await call('POST', '/api/health/act', { card_id: 'sub-miro', action: 'cancel', as: 'kason' });
+  const disputed = await call('POST', '/api/health/act', { card_id: 'dup-figma', action: 'dispute', as: 'eric' });
+  const cancelled = await call('POST', '/api/health/act', { card_id: 'sub-miro', action: 'cancel', as: 'eric' });
   check('   dispute + cancel: both handled, crossed out', disputed.status === 200 && cancelled.body.needs_you.handled.length === 3);
   const wrong = await call('POST', '/api/health/feedback', { card_id: 'spend', kind: 'wrong', reason: 'The split by purpose is wrong' });
   check('   "This is wrong" removes the card', wrong.body.needs_you.cards.length === 0);

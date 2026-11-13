@@ -1,7 +1,7 @@
 'use client';
 /**
  * Who the demo is "logged in" as. There's no real login in the prototype; the avatar menu (or ?as= in
- * the URL) picks Kason (founder, admin), Jordan (admin), Ana (teammate) or Dana (Rho account manager).
+ * the URL) picks Eric (founder, admin), Jordan (admin), Ana (teammate) or Dana (Rho account manager).
  */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import usersFile from '@/data/business-health/users.json';
@@ -17,7 +17,7 @@ type ViewerState = { viewer: AppUser; users: AppUser[]; setViewer: (id: string) 
 const ViewerContext = createContext<ViewerState>({ viewer: USERS[0], users: USERS, setViewer: () => {} });
 
 export function ViewerProvider({ children }: { children: React.ReactNode }) {
-  const [id, setId] = useState('kason');
+  const [id, setId] = useState('eric');
 
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get('as');

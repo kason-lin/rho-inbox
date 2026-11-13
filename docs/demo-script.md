@@ -1,6 +1,6 @@
 # 90-second demo: "The invoice nobody entered"
 
-**One story:** Kason Lin runs Loop Labs, a 12-person startup on Rho. A design agency's $55K invoice sat in email for weeks. Rho finds it, sees checking will come up short, and gets the fix approved in one tap.
+**One story:** Eric Li runs Loop Labs, a 12-person startup on Rho. A design agency's $55K invoice sat in email for weeks. Rho finds it, sees checking will come up short, and gets the fix approved in one tap.
 
 **The point to land:** Rho already has the bank data. Connect your inbox and tools (read-only), and Rho sees what you owe before it's due. You just say yes.
 
