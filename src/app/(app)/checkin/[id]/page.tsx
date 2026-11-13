@@ -68,8 +68,8 @@ export default function CardPage({ params }: { params: Promise<{ id: string }> }
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
           <div>
             <TypeChip type={card.type} urgent={card.urgent} />
-            <h1 className="mt-2 font-display text-[26px] leading-tight font-semibold">{card.title}</h1>
-            {card.question && <p className="mt-1 text-lg">{card.question}</p>}
+            <h1 className="mt-2 text-[20px] leading-snug font-semibold">{card.title}</h1>
+            {card.question && <p className="mt-0.5 text-[15px]">{card.question}</p>}
             <DataAsOf iso={card.data_as_of} className="mt-2 block" />
             <div className="mt-6">
               {step === 'confirm' && card.action ? (
@@ -168,7 +168,7 @@ function ConfirmScreen({ action, accounts }: { action: PreparedAction; accounts:
 
   return (
     <Card title="Confirm">
-      <div className="divide-y border-t">
+      <div className="divide-y">
         {action.kind === 'transfer' && (
           <>
             <Field label="From">{acct(action.from)?.name} ••{acct(action.from)?.last4} · {formatUSD(acct(action.from)?.balance)}</Field>
@@ -216,7 +216,7 @@ function DoneScreen({ done }: { done: DoneState }) {
       <div className={`mx-auto grid size-14 place-items-center rounded-full ${approved ? 'bg-positive-bg text-positive' : 'bg-accent text-ink-2'}`}>
         <CheckCircle2 className="size-7" />
       </div>
-      <h1 className="mt-4 font-display text-3xl font-semibold">{done.headline}</h1>
+      <h1 className="mt-4 text-[22px] font-semibold">{done.headline}</h1>
       <p className="mt-2 text-[15px] text-ink-2">{done.detail}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 text-left">

@@ -9,6 +9,8 @@ A founder or finance lead at a small company checks Cards, Bill Pay, Invoicing, 
 
 > Prototype only. Not affiliated with or endorsed by Rho. All data is synthetic (a made-up company, Loop Labs), no real money moves, and anything about Rho's internal systems is an assumption.
 
+![Home: Rho's dashboard with this week's Check-in on top](docs/screenshots/00-home.png)
+
 | The Monday email | Proof behind a card | Confirm |
 | --- | --- | --- |
 | ![Monday email](docs/screenshots/01-email.png) | ![Proof](docs/screenshots/02-proof.png) | ![Confirm](docs/screenshots/03-confirm.png) |
@@ -189,13 +191,12 @@ The build command is the default `next build`.
 
 ## Design notes
 
-The UI follows the layout and tokens of Rho's signed-in app (see `docs/design-notes.md`), measured from Rho's public product walkthrough and app login page. Rho's licensed fonts are replaced with free look-alikes:
+The app frame and Home follow the layout and color tokens of Rho's signed-in dashboard (see `docs/design-notes.md`), measured from Rho's public product walkthrough and app login page. The new features (Inbox, Check-in, Audit log, Architecture) are added into that frame. All numbers are Loop Labs' synthetic data, the greeting copy is our own, and the wordmark is typed text rather than Rho's logo. Rho's licensed fonts are replaced with free look-alikes:
 
 | Rho font | Free stand-in |
 | --- | --- |
-| Basier Circle | Manrope |
-| Degular | Outfit |
-| Neue Montreal | Inter Tight |
+| Basier Circle (app UI) | DM Sans |
+| Neue Montreal (marketing site) | Inter Tight |
 
 ## Security notes
 

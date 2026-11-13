@@ -16,7 +16,7 @@ function BellMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="relative grid size-8 place-items-center rounded-md hover:bg-accent" aria-label={`${unread.length} unread`}>
-        <Bell className="size-4" strokeWidth={1.75} />
+        <Bell className="size-[17px]" strokeWidth={1.6} />
         {unread.length > 0 && (
           <span className="tabular absolute -top-0.5 -right-0.5 grid min-w-4 place-items-center rounded-full bg-negative px-1 text-[10px] leading-4 font-semibold text-white">
             {unread.length}
@@ -54,9 +54,9 @@ function ViewerMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-md py-1 pr-1.5 pl-1 text-left hover:bg-accent">
-        <span className="grid size-7 place-items-center rounded-full bg-[#fbe3ec] text-[11px] font-semibold text-[#9c2b56]">{initials(viewer.name)}</span>
+        <span className="grid size-[30px] place-items-center rounded-full bg-[#fbe0ec] text-[11px] font-semibold text-[#c2316e]">{initials(viewer.name)}</span>
         <span className="leading-tight">
-          <span className="block text-[13px] font-medium">{viewer.name}</span>
+          <span className="block text-[12px] font-semibold">{viewer.name}</span>
           <span className="block text-[11px] text-muted-foreground">{ROLE_LABEL[viewer.role]}</span>
         </span>
         <ChevronDown className="size-3.5 opacity-50" />
@@ -82,12 +82,12 @@ function ViewerMenu() {
 
 export function Topbar() {
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-end gap-2 border-b bg-white/90 px-6 backdrop-blur">
-      <span className="flex items-center gap-1.5 rounded-md bg-lavender px-2.5 py-1 text-xs font-medium text-lavender-ink">
-        <Gift className="size-3.5" /> Earn $500
+    <header className="sticky top-0 z-20 flex h-[58px] items-center justify-end gap-3 border-b bg-white px-7">
+      <span className="flex items-center gap-1.5 rounded-md border border-[#d9d0ff] bg-[linear-gradient(90deg,#ece8ff,#f6e9ff_55%,#e6f0ff)] px-2.5 py-[5px] text-[12px] font-semibold text-[#2f2477]">
+        <Gift className="size-3.5" strokeWidth={1.75} /> Earn $500
       </span>
-      <span className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-ink-2">
-        <CircleHelp className="size-3.5" /> Help Center
+      <span className="flex items-center gap-1.5 px-1 text-[12px] font-semibold text-foreground">
+        <CircleHelp className="size-[15px]" strokeWidth={1.75} /> Help Center
       </span>
       <BellMenu />
       <ViewerMenu />

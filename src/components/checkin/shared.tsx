@@ -64,7 +64,7 @@ export function ProofView({ sections }: { sections: ProofSection[] }) {
     <div className="space-y-5">
       {sections.map(s => (
         <div key={s.title}>
-          <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{s.title}</h3>
+          <h3 className="mb-2 text-[13px] font-semibold">{s.title}</h3>
           <div className="divide-y rounded-lg border bg-white">
             {s.items.map((i, n) => (
               <div key={n} className={cn('flex items-center gap-4 px-4 py-2.5 text-[13px]', i.emphasis && 'bg-tint font-semibold')}>

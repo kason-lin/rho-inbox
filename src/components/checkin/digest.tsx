@@ -13,7 +13,7 @@ export function DigestCard({ as, compact = false }: { as?: string; compact?: boo
   return (
     <div className={cn('rounded-lg border bg-white', compact ? 'p-4' : 'mb-5 p-5')}>
       <div className="mb-1.5 flex items-center justify-between gap-3">
-        <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Your week in three sentences</span>
+        <span className="text-[13px] font-semibold">Your week in three sentences</span>
         {data && (
           <span
             title={data.note}

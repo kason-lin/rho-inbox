@@ -27,7 +27,7 @@ export default function CheckinPage() {
         <>
           <DigestCard />
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="font-display text-xl font-semibold">
+            <h2 className="text-[14px] font-semibold">
               {data.cards.length ? `${data.cards.length} ${data.cards.length === 1 ? 'thing needs' : 'things need'} you` : "You're all set this week"}
             </h2>
             <DataAsOf iso={data.data_as_of} />

@@ -84,7 +84,7 @@ export default function ArchitecturePage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="What’s real in the prototype">
-          <ul className="divide-y border-t">
+          <ul className="divide-y">
             {REAL.map(([name, what, where]) => (
               <li key={name} className="px-5 py-3 text-[13px]">
                 <div className="font-medium">{name}</div>
@@ -95,7 +95,7 @@ export default function ArchitecturePage() {
           </ul>
         </Card>
         <Card title="Design notes">
-          <ul className="divide-y border-t">
+          <ul className="divide-y">
             {NOTES.map(([name, what]) => (
               <li key={name} className="px-5 py-3 text-[13px]">
                 <div className="font-medium">{name}</div>

@@ -22,6 +22,13 @@ async function main() {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
+  // 0. Home: Rho's dashboard with this week's Check-in on top
+  await page.goto(`${BASE}/?as=maya`);
+  await page.getByText('Monday Check-in').first().waitFor();
+  await page.getByText('Top outflows').waitFor();
+  await page.waitForFunction(() => !document.querySelector('.animate-pulse'));
+  await shot(page, '00-home');
+
   // 1. The Monday email
   await page.goto(`${BASE}/mail`);
   await page.getByText('Review the $5,000 transfer').waitFor();

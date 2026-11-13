@@ -185,7 +185,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 function Section({ title, count, empty, children }: { title: string; count: number; empty: string; children: React.ReactNode }) {
   return (
     <section className="mb-6">
-      <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+      <h2 className="mb-2.5 flex items-center gap-2 text-[14px] font-semibold">
         {title} <span className="tabular rounded-full bg-accent px-1.5 text-[11px] text-ink-2">{count}</span>
       </h2>
       <div className="divide-y overflow-hidden rounded-lg border bg-white">

@@ -6,9 +6,9 @@
  * variable names shadcn/ui components expect. Light theme only, like the real app.
  */
 :root {
-  --radius: 0.5rem;
+  --radius: 0.625rem;            /* Rho's cards are ~10px */
 
-  --background: #fdfdfd;          /* canvas */
+  --background: #ffffff;          /* canvas: Rho's app is white, cards are outlined */
   --foreground: #151716;          /* ink */
   --card: #ffffff;
   --card-foreground: #151716;
@@ -23,7 +23,7 @@
   --accent: #e9eeec;              /* hover / selected */
   --accent-foreground: #151716;
   --destructive: #db1a2d;
-  --border: #e3e8e6;
+  --border: #e9edeb;
   --input: #d7e0de;
   --ring: #048d73;
 
@@ -50,8 +50,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-outfit), var(--font-manrope), sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-dm-sans), ui-sans-serif, sans-serif;   /* Rho's app headings use the same sans */
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
   --font-wordmark: var(--font-instrument-serif), Georgia, serif;
 
@@ -112,7 +112,7 @@
     @apply border-border outline-ring/50;
   }
   html {
-    font-size: 15px;   /* Rho's app uses 15px body text */
+    font-size: 14px;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
