@@ -1,0 +1,89 @@
+{
+  "_about": "One month of Claude (Anthropic) usage, tagged by the project that used it. The records must add up to the card charge exactly. 'building' = making the next release; 'running' = serving customers. Sample data.",
+  "provider": "Claude (Anthropic)",
+  "month": "November 2026",
+  "card_charge": {
+    "id": "txn-cortex-nov",
+    "date": "2026-11-15",
+    "amount": 50000,
+    "card_last4": "4102",
+    "card_owner": "Kason Lin",
+    "description": "Anthropic · Claude API usage"
+  },
+  "purposes": {
+    "building": "Building the product",
+    "running": "Running the product for customers"
+  },
+  "records": [
+    {
+      "id": "u-01",
+      "project": "Code assistant for engineers",
+      "purpose": "building",
+      "amount": 6200,
+      "period": "Nov 1–7"
+    },
+    {
+      "id": "u-02",
+      "project": "Code assistant for engineers",
+      "purpose": "building",
+      "amount": 8300,
+      "period": "Nov 8–14"
+    },
+    {
+      "id": "u-03",
+      "project": "Next release: new onboarding",
+      "purpose": "building",
+      "amount": 4900,
+      "period": "Nov 1–7"
+    },
+    {
+      "id": "u-04",
+      "project": "Next release: new onboarding",
+      "purpose": "building",
+      "amount": 4900,
+      "period": "Nov 8–14"
+    },
+    {
+      "id": "u-05",
+      "project": "Test data generation",
+      "purpose": "building",
+      "amount": 3100,
+      "period": "Nov 1–7"
+    },
+    {
+      "id": "u-06",
+      "project": "Test data generation",
+      "purpose": "building",
+      "amount": 4600,
+      "period": "Nov 8–14"
+    },
+    {
+      "id": "u-07",
+      "project": "Customer support assistant",
+      "purpose": "running",
+      "amount": 5300,
+      "period": "Nov 1–7"
+    },
+    {
+      "id": "u-08",
+      "project": "Customer support assistant",
+      "purpose": "running",
+      "amount": 5300,
+      "period": "Nov 8–14"
+    },
+    {
+      "id": "u-09",
+      "project": "Smart search in the app",
+      "purpose": "running",
+      "amount": 3650,
+      "period": "Nov 1–7"
+    },
+    {
+      "id": "u-10",
+      "project": "Smart search in the app",
+      "purpose": "running",
+      "amount": 3750,
+      "period": "Nov 8–14"
+    }
+  ]
+}

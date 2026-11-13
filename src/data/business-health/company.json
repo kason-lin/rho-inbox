@@ -1,0 +1,25 @@
+{
+  "_about": "Loop Labs (YC-backed, 12 people) on the demo day, Wed Nov 18: bank balances, payments already on the calendar, burn and tools. Sample data from the Check-in build spec; edit any number and the demo follows.",
+  "company": "Loop Labs",
+  "people": 12,
+  "forecast_start": "2026-11-18",
+  "forecast_end": "2026-12-02",
+  "checking": { "name": "Checking", "last4": "4821", "balance": 62400 },
+  "treasury": { "name": "Treasury", "last4": "7310", "balance": 1180000 },
+  "payroll": [
+    { "id": "payroll-2026-11-20", "date": "2026-11-20", "amount": 41200, "label": "Friday payroll", "detail": "12 people, paid every other Friday (from Gusto)" }
+  ],
+  "bills": [],
+  "burn": {
+    "three_month_average": 103500,
+    "projected": 115920,
+    "drivers": [
+      { "label": "2 new hires starting Dec 1", "monthly": 9900, "source": "Gusto" },
+      { "label": "A raise found in a signed contract email", "monthly": 2520, "source": "Gmail" }
+    ]
+  },
+  "subscriptions": [
+    { "id": "sub-miro", "vendor": "Miro", "monthly": 50, "card_last4": "5520", "card_owner": "Ana Costa", "last_login_days": 60 }
+  ],
+  "other_checks": 14
+}

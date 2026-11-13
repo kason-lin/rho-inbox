@@ -1,0 +1,66 @@
+{
+  "_about": "The tools Loop Labs connects for Business health, and exactly what each one is allowed to see. All read-only. Mock connections: nothing real is contacted.",
+  "tools": [
+    {
+      "id": "inbox",
+      "name": "Gmail",
+      "what": "Finds invoices, contracts and renewals that arrive by email",
+      "scopes": [
+        "Read email messages (gmail.readonly)",
+        "No sending, deleting or labeling"
+      ]
+    },
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "what": "Expected payouts from customer payments",
+      "scopes": [
+        "Read payouts (read_only)",
+        "Read balance (read_only)"
+      ]
+    },
+    {
+      "id": "payroll",
+      "name": "Gusto",
+      "what": "Pay dates and payroll totals",
+      "scopes": [
+        "Read pay schedule (read-only)",
+        "Read payroll totals, not individual salaries"
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "Anthropic (Claude)",
+      "what": "AI usage and cost by project, for Where it goes",
+      "scopes": [
+        "Read usage and cost reports",
+        "No access to prompts or outputs"
+      ]
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "what": "AI usage and cost by project (optional)",
+      "scopes": [
+        "Read usage and cost reports",
+        "No access to prompts or outputs"
+      ]
+    },
+    {
+      "id": "aws",
+      "name": "AWS",
+      "what": "Cloud cost by service and tag (optional)",
+      "scopes": [
+        "Read Cost Explorer (ce:Get*)",
+        "No changes to infrastructure"
+      ]
+    }
+  ],
+  "rho_note": "Write actions are the next step with Rho; their connection is read-only today.",
+  "required": [
+    "inbox",
+    "stripe",
+    "payroll",
+    "ai"
+  ]
+}

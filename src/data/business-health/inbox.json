@@ -1,0 +1,47 @@
+{
+  "_about": "Loop Labs' mock email inbox. The Business health backend reads these and pulls out invoices (amount, date, terms). Sample data: no real email is read.",
+  "owner": "kason@looplabs.example",
+  "emails": [
+    {
+      "id": "em-northbeam-invoice",
+      "received": "2026-10-03T09:14:00",
+      "from_name": "Alex Moreno · Northbeam Studio",
+      "from": "billing@northbeam.example",
+      "subject": "Invoice NB-2026-104: Loop Labs app redesign",
+      "attachment": "Northbeam_NB-2026-104.pdf",
+      "body": "Hi Kason,\n\nThank you again for working with us on the Loop Labs app redesign. Our invoice for the project is attached.\n\nInvoice: NB-2026-104\nInvoice date: October 3, 2026\nAmount due: $55,000.00\nPayment terms: Net 60\n\nBank details are on the attached PDF. Let us know if you have any questions.\n\nBest,\nAlex Moreno\nNorthbeam Studio"
+    },
+    {
+      "id": "em-halcyon",
+      "received": "2026-10-03T08:02:00",
+      "from_name": "Jamie Ortiz · Halcyon Health",
+      "from": "jamie@halcyon.example",
+      "subject": "Re: pilot kickoff next week",
+      "body": "Hi Kason,\n\nWe're all set for the pilot kickoff on Tuesday. Looking forward to it.\n\nJamie"
+    },
+    {
+      "id": "em-jordan",
+      "received": "2026-10-02T17:40:00",
+      "from_name": "Jordan Ellis",
+      "from": "jordan@looplabs.example",
+      "subject": "Hiring plan: two part-time engineers",
+      "body": "Draft hiring plan attached. Both would start December 1.\n\nJordan"
+    },
+    {
+      "id": "em-stripe-summary",
+      "received": "2026-10-02T07:00:00",
+      "from_name": "Stripe",
+      "from": "notifications@stripe.example",
+      "subject": "Your weekly payments summary",
+      "body": "You received 214 payments last week. Payouts arrive on your usual schedule."
+    },
+    {
+      "id": "em-newsletter",
+      "received": "2026-10-01T12:30:00",
+      "from_name": "Founder Weekly",
+      "from": "hello@founderweekly.example",
+      "subject": "5 ways to extend your runway",
+      "body": "This week: pricing experiments, vendor reviews and more."
+    }
+  ]
+}

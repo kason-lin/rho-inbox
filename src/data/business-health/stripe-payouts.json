@@ -1,0 +1,7 @@
+{
+  "_about": "Payouts Stripe expects to send to Loop Labs' checking before the invoice is due ($14,000 in total). Sample data: edit dates or amounts freely.",
+  "payouts": [
+    { "id": "po_1QnB24", "date": "2026-11-24", "amount": 6500, "detail": "Customer card payments from Nov 17 to Nov 21" },
+    { "id": "po_1QnF01", "date": "2026-12-01", "amount": 7500, "detail": "Customer card payments from Nov 24 to Nov 28" }
+  ]
+}
