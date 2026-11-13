@@ -3,7 +3,7 @@
  * Story beat 2: on Nov 18, 14 days before the invoice is due, Rho sends one alert (email or text, the
  * founder picks). It goes out only because a decision is due. Review opens the Business health tab.
  */
-import { BellOff, ChevronLeft, Mail, MessageSquare } from 'lucide-react';
+import { Archive, ArrowLeft, BellOff, ChevronLeft, Clock, Forward, Mail, MessageSquare, MoreVertical, Reply, Star, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PresenterBar } from '@/components/health/presenter-bar';
@@ -16,7 +16,7 @@ import { cn } from 'cn';
 
 export default function AlertPage() {
   const { data } = useHealth();
-  const [channel, setChannel] = useState<'email' | 'text'>('email');
+  const [channel, setChannel] = useState<'email' | 'text'>('text');
   const alert = data?.alert;
   const before = data?.forecast_before ?? data?.forecast;
   const plan = data?.suggested ?? (data?.approval ? { transfer_amount: data.approval.transfer_amount, pay_date: data.approval.pay_date } : null);
@@ -43,7 +43,7 @@ export default function AlertPage() {
             </div>
             <div className="flex gap-2">
               <div className="flex rounded-md border bg-white p-0.5">
-                {(['email', 'text'] as const).map(c => (
+                {(['text', 'email'] as const).map(c => (
                   <button key={c} type="button" onClick={() => setChannel(c)} className={cn('flex items-center gap-1.5 rounded px-3 py-1 text-[12px] font-semibold', channel === c ? 'bg-[#151716] text-white' : 'text-ink-2 hover:bg-[#f2f5f4]')}>
                     {c === 'email' ? <Mail className="size-3.5" /> : <MessageSquare className="size-3.5" />} {c === 'email' ? 'Email' : 'Text'}
                   </button>
@@ -55,30 +55,65 @@ export default function AlertPage() {
 
           <div className="grid items-start gap-6 lg:grid-cols-[1fr_300px]">
             {channel === 'email' ? (
-              <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-                <div className="border-b bg-[#f7f9f8] px-6 py-3 text-[12px] text-muted-foreground">
-                  From: Rho &lt;alerts@rho.co&gt; · To: Kason Lin · Subject: <span className="text-foreground">{alert.text.split('.')[0]}</span>
+              <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+                {/* mail client toolbar */}
+                <div className="flex items-center gap-4 border-b px-5 py-2.5 text-[#5f6368]">
+                  <ArrowLeft className="size-4" /><Archive className="size-4" /><Trash2 className="size-4" /><Mail className="size-4" /><Clock className="size-4" />
+                  <span className="ml-auto text-[12px]">1 of 248</span>
                 </div>
-                <div className="space-y-4 px-6 py-6">
-                  <p className="font-wordmark text-[26px] leading-none">Rho</p>
-                  <Chip tone="red">Needs you · due {shortDay(alert.invoice.due)}</Chip>
-                  <h2 className="text-[18px] leading-snug font-semibold">
-                    {alert.invoice.vendor}’s {formatUSDShort(alert.invoice.amount)} invoice is due in {alert.days_until_due} days. Checking will be {formatUSDShort(alert.short_by)} short.
+                <div className="px-6 pt-5">
+                  <h2 className="flex flex-wrap items-center gap-2 text-[21px] text-[#1f1f1f]">
+                    {alert.text.split('.')[0]}
+                    <span className="rounded bg-[#e8eaed] px-1.5 py-0.5 text-[11px] text-[#444746]">Inbox</span>
                   </h2>
-                  <MathTable rows={mathRows(before)} />
-                  {plan && (
-                    <p className="text-[13px] text-ink-2">
-                      Suggested fix: set aside {formatUSDShort(plan.transfer_amount)} from treasury now (it settles in 0–2 business days) and schedule the payment for {shortDay(plan.pay_date)}. One approval does both.
-                    </p>
-                  )}
-                  <div className="flex flex-wrap gap-2">
-                    <Link href="/business-health"><Btn variant="mint">Review in Rho</Btn></Link>
-                    <Link href={`/mailbox?email=${alert.invoice.id}`}><Btn>See the invoice</Btn></Link>
+                  <div className="mt-4 flex items-start gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#0f0f10] font-wordmark text-[18px] text-[#f5f8f8]">R</span>
+                    <div className="min-w-0 flex-1 text-[13px]">
+                      <div><span className="font-semibold text-[#1f1f1f]">Rho</span> <span className="text-[12px] text-[#5f6368]">&lt;alerts@rho.co&gt;</span></div>
+                      <div className="text-[12px] text-[#5f6368]">to me</div>
+                    </div>
+                    <div className="flex items-center gap-3 text-[12px] text-[#5f6368]">
+                      <span>{shortDay(data.date)}, 8:00 AM</span><Star className="size-4" /><Reply className="size-4" /><MoreVertical className="size-4" />
+                    </div>
                   </div>
-                  <p className="border-t pt-4 text-[12px] text-muted-foreground">
-                    Found in {data.invoice_email?.to} (read-only). You get this because a decision is due, not on a schedule.
-                    Reminder in 5 business days if nothing’s done. Sample data; prototype alert, not sent by Rho.
-                  </p>
+                </div>
+
+                {/* the HTML email itself */}
+                <div className="mx-6 mt-5 mb-6 rounded-lg bg-[#f4f6f6] px-4 py-6 sm:ml-[76px]">
+                  <div className="mx-auto max-w-[560px] overflow-hidden rounded-lg bg-white">
+                    <div className="flex items-center justify-between bg-[#0f0f10] px-6 py-4">
+                      <span className="font-wordmark text-[24px] leading-none text-[#f5f8f8]">Rho</span>
+                      <span className="font-mono text-[10.5px] tracking-[0.06em] text-[#6af3d9] uppercase">Business health</span>
+                    </div>
+                    <div className="space-y-4 px-6 py-6 text-[14px] text-[#1b2122]">
+                      <p>Hi {data.invoice_email ? 'Kason' : 'there'},</p>
+                      <Chip tone="red">Needs you · due {shortDay(alert.invoice.due)}</Chip>
+                      <h3 className="text-[20px] leading-snug font-normal tracking-[-0.01em] text-[#0c0f0f]">
+                        {alert.invoice.vendor}’s {formatUSDShort(alert.invoice.amount)} invoice is due in {alert.days_until_due} days. Checking will be {formatUSDShort(alert.short_by)} short.
+                      </h3>
+                      <MathTable rows={mathRows(before)} />
+                      {plan && (
+                        <p className="text-[#364244]">
+                          Suggested fix: set aside {formatUSDShort(plan.transfer_amount)} from treasury now (it settles in 0–2 business days) and schedule the payment for {shortDay(plan.pay_date)}. One approval does both.
+                        </p>
+                      )}
+                      <div className="pt-1 text-center">
+                        <Link href="/business-health" className="inline-flex h-11 items-center rounded-lg bg-[#0c0f0f] px-6 text-[14px] text-[#f5f8f8] hover:bg-[#1b2122]">Review in Rho</Link>
+                        <div className="mt-3"><Link href={`/mailbox?email=${alert.invoice.id}`} className="text-[13px] text-[#007a6a] underline">See the original invoice email</Link></div>
+                      </div>
+                      <p className="text-[#364244]">— Rho</p>
+                    </div>
+                    <div className="border-t border-[#dfe7e8] px-6 py-4 text-[11px] leading-relaxed text-[#7f9195]">
+                      Found in {data.invoice_email?.to} (read-only). You get this because a decision is due, not on a schedule. Reminder in 5 business days if nothing’s done.
+                      <div className="mt-2"><span className="underline">Manage alerts</span> · <span className="underline">Switch to text</span></div>
+                      <div className="mt-2">Sample data. Prototype alert, not sent by Rho.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 px-6 pb-6 sm:pl-[76px]">
+                  <span className="flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] text-[#444746]"><Reply className="size-4" /> Reply</span>
+                  <span className="flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] text-[#444746]"><Forward className="size-4" /> Forward</span>
                 </div>
               </div>
             ) : (

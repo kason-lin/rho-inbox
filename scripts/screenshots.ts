@@ -37,9 +37,9 @@ async function main() {
   await page.getByRole('button', { name: 'Jump to Wed, Nov 18 →' }).click();
   await page.waitForURL('**/alert');
   await page.getByText('Why now').waitFor();
-  await shot(page, '02-alert-email');
-  await page.getByRole('button', { name: 'Text', exact: true }).click();
   await shot(page, '03-alert-text');
+  await page.getByRole('button', { name: 'Email', exact: true }).click();
+  await shot(page, '02-alert-email');
 
   // 3. Review → Business health tab
   await page.getByRole('link', { name: 'Review in Rho →' }).click();
