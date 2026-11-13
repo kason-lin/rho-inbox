@@ -9,23 +9,24 @@ import { signedUSD, type MathRow } from '@/lib/health/math';
 import { cn } from 'cn';
 
 type Tone = 'plain' | 'red' | 'teal' | 'amber';
+// Rho's semantic colors: urgent #c91829, warning #a86500 on #fff4e0, handled #007a6a on #e6fdf9, mist wash.
 const TONES: Record<Tone, string> = {
-  plain: 'bg-[#f2f5f4] text-ink-2',
-  red: 'bg-negative-bg text-negative',
-  teal: 'bg-positive-bg text-positive',
-  amber: 'bg-warning-bg text-warning ring-1 ring-warning-border',
+  plain: 'bg-[rgb(129_165_169/12%)] text-[#364244]',
+  red: 'bg-[#fdecee] text-[#c91829]',
+  teal: 'bg-[#e6fdf9] text-[#007a6a]',
+  amber: 'bg-[#fff4e0] text-[#a86500]',
 };
 
-/** A small rounded label, e.g. "Act · Due in 14 days". */
+/** A small rounded label in Rho's mono caps, e.g. "Act · Due in 14 days". */
 export function Chip({ tone = 'plain', className, children }: { tone?: Tone; className?: string; children: React.ReactNode }) {
-  return <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap', TONES[tone], className)}>{children}</span>;
+  return <span className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10.5px] tracking-[0.06em] whitespace-nowrap uppercase', TONES[tone], className)}>{children}</span>;
 }
 
 type Variant = 'mint' | 'dark' | 'line' | 'link';
 const VARIANTS: Record<Variant, string> = {
-  mint: 'h-8 rounded-md bg-mint px-3 text-mint-ink hover:bg-mint-hover',
-  dark: 'h-8 rounded-md bg-[#151716] px-3 text-white hover:bg-black',
-  line: 'h-8 rounded-md border bg-white px-3 hover:bg-[#f2f5f4]',
+  mint: 'h-8 rounded-lg bg-[#6af3d9] px-3.5 text-[#0c0f0f] hover:bg-[#00e1bf]',
+  dark: 'h-8 rounded-lg bg-[#0c0f0f] px-3.5 text-[#f5f8f8] hover:bg-[#1b2122]',
+  line: 'h-8 rounded-lg border border-[#dfe7e8] bg-white px-3.5 text-[#0c0f0f] hover:bg-[rgb(129_165_169/8%)]',
   link: 'h-auto px-0 text-brand hover:underline',
 };
 
@@ -34,7 +35,7 @@ export function Btn({ variant = 'line', className, ...props }: React.ButtonHTMLA
     <button
       type="button"
       {...props}
-      className={cn('inline-flex items-center justify-center gap-1.5 text-[12px] font-semibold disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-3.5', VARIANTS[variant], className)}
+      className={cn('inline-flex items-center justify-center gap-1.5 text-[12px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-3.5', VARIANTS[variant], className)}
     />
   );
 }

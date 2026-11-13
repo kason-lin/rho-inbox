@@ -146,20 +146,48 @@ function Narration({ amount }: { amount: number }) {
   );
 }
 
-/** What Rho's read-only inbox connection noticed about this email: the invoice, its line items, and that nobody has entered it. */
+/** What Rho's read-only inbox connection noticed about this email, styled like Rho: the invoice, its line items, and that nobody has entered it. */
 function FoundByRho({ invoice, afterAlert }: { invoice: Invoice; afterAlert: boolean }) {
   const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  const due = new Date(`${invoice.due}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const tag = 'rounded-full px-2.5 py-1 font-mono text-[10.5px] tracking-[0.06em] uppercase';
   return (
-    <div className="mt-5 max-w-xl rounded-lg border border-[#c7ebe3] bg-[#f8fcfb] p-4 text-[13px]">
-      <div className="flex items-center gap-2 font-semibold"><Sparkles className="size-4 text-[#048d73]" /> Rho found an invoice <span className="font-normal text-[#5f6368]">· {invoice.number} · net {invoice.terms_days}</span></div>
-      <dl className="mt-3 rounded-md border bg-white tabular">
-        {invoice.lines.map(l => <div key={l.label} className="flex justify-between border-b px-3 py-2"><dt>{l.label}</dt><dd>{usd(l.amount)}</dd></div>)}
-        <div className="flex justify-between px-3 py-2 font-semibold"><dt>Amount due · {shortDay(invoice.due)}, {invoice.due.slice(0, 4)}</dt><dd>{usd(invoice.amount)}</dd></div>
-      </dl>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Chip tone="amber">Not in Rho Bills</Chip>
-        <Chip>Not forwarded</Chip>
-        <Link href="/business-health" className="ml-auto font-semibold text-[#048d73] hover:underline">{afterAlert ? 'Review in Business health →' : 'See it in Business health →'}</Link>
+    <div className="shadow-rho mt-6 max-w-xl overflow-hidden rounded-xl border border-[rgb(129_165_169/20%)] bg-white text-[#0c0f0f]">
+      {/* header: Rho mark + mono eyebrow */}
+      <div className="flex items-center gap-3 bg-[#0f0f10] px-5 py-3">
+        <span className="font-wordmark text-[20px] leading-none text-[#f5f8f8]">Rho</span>
+        <span className="flex items-center gap-1.5 font-mono text-[11px] tracking-[0.06em] text-[#6af3d9] uppercase">
+          <Sparkles className="size-3.5" /> Found an invoice
+        </span>
+        <span className="ml-auto font-mono text-[11px] tracking-[0.06em] text-[#7f9195] uppercase">{invoice.number} · Net {invoice.terms_days}</span>
+      </div>
+
+      <div className="px-5 pt-5 pb-4">
+        <div className="font-mono text-[11px] tracking-[0.06em] text-[#7f9195] uppercase">{invoice.vendor} · amount due</div>
+        <div className="mt-1 text-[34px] leading-[1.1] font-normal tracking-[-0.02em] tabular">{usd(invoice.amount)}</div>
+        <div className="mt-1 text-[13px] text-[#364244]">Due {due}</div>
+
+        <dl className="mt-4 text-[13px] tabular">
+          {invoice.lines.map(l => (
+            <div key={l.label} className="flex justify-between border-t border-[#dfe7e8] py-2.5">
+              <dt className="text-[#364244]">{l.label}</dt><dd>{usd(l.amount)}</dd>
+            </div>
+          ))}
+          <div className="flex justify-between border-t border-[#0c0f0f] py-2.5 font-medium">
+            <dt>Total</dt><dd>{usd(invoice.amount)}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 border-t border-[#dfe7e8] bg-[rgb(129_165_169/8%)] px-5 py-3">
+        <span className={`${tag} bg-[#fff4e0] text-[#a86500]`}>Not in Rho Bills</span>
+        <span className={`${tag} bg-white text-[#364244] ring-1 ring-[#dfe7e8]`}>Not forwarded</span>
+        <Link
+          href="/business-health"
+          className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#0c0f0f] px-4 text-[13px] text-[#f5f8f8] transition-colors hover:bg-[#1b2122]"
+        >
+          {afterAlert ? 'Review in Business health' : 'See it in Business health'} <span aria-hidden>→</span>
+        </Link>
       </div>
     </div>
   );
